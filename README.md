@@ -25,8 +25,9 @@ Cada desarrollador crea y gestiona sus propias ramas según la tarea asignada.
 
 ### Pull Requests
 
-- Todo cambio debe realizarse en una rama
-- No se permite push directo a `main`
-- Los cambios se integran mediante Pull Request
-- Al menos 1 aprobación es requerida antes del merge
-- Consultar docs/CONTRIBUTING.md para ver como funciona 
+- Todo cambio debe realizarse en una rama (nunca directamente en `main`)
+- No se realizan pushes directos a `main` (regla del equipo)
+- Los cambios se integran exclusivamente mediante Pull Request
+- Todo PR requiere al menos **1 aprobación de un miembro del equipo distinto al autor**
+- Consultar `docs/CONTRIBUTING.md` para el flujo detallado
+- Importante: estas reglas son convenciones del equipo. GitHub no las hace cumplir automáticamente, pero **se espera que todos las respeten**
