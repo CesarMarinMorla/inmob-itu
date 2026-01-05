@@ -2,11 +2,11 @@
 
 Repositorio nuevo desde cero para proyecto inmobiliaria
 
-# Branching
+## Branching
 
-El branching dependerá del trabajo individual que cada uno esté haciendo, yo no les daré nombre personalmente - César 
+Cada desarrollador crea y gestiona sus propias ramas según la tarea asignada.
 
-##Convenciones de commits
+## Convenciones de commits
 
 - feat: funcionalidad
 - fix: corrección
@@ -16,3 +16,9 @@ El branching dependerá del trabajo individual que cada uno esté haciendo, yo n
 - test: pruebas
 - build: build / tooling
 - ci: integración continua
+
+### Ejemplos de commits 
+
+feat(auth): agregar login con JWT
+fix(ui): corregir desborde del navbar
+chore(db): actualizar migración inicial
