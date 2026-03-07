@@ -1,10 +1,29 @@
-# Node.js
-node_modules/
-dist/
-build/
-.env
-.env.local
-.env.*.local
+# Node.js (Frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.vite/
+
+# Java/Spring Boot (Backend)
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/logs/
+backend/*.log
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.metadata
+backend/bin/
+backend/build/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
 
 # Logs
 logs/
@@ -13,26 +32,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# VSCode
-.vscode/
-
-# Mac system files
-.DS_Store
-
-# TypeScript
-*.tsbuildinfo
-
-# Frontend specific (Vite/React)
-.vite/
+# Other
+database/seeds.sql
+scripts/*.tmp
 out/
 public/build/
-
-# Database / Seeds (if you don’t want them versioned)
-database/seeds.sql
-
-# Optional: temporary files/scripts
-scripts/*.tmp
-
-# OS / IDE
-.idea/
-*.swp
+*.tsbuildinfo
