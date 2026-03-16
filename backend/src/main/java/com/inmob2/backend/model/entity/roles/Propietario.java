@@ -3,11 +3,11 @@ package com.inmob2.backend.model.entity.roles;
 import com.inmob2.backend.model.entity.enums.CondicionIva;
 import com.inmob2.backend.model.entity.propiedad.Propiedad;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("PROPIETARIO")
+@Table(name = "propietario")
 @Getter
 @Setter
 @NoArgsConstructor

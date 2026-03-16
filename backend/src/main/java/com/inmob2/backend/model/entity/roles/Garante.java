@@ -2,16 +2,16 @@ package com.inmob2.backend.model.entity.roles;
 
 import com.inmob2.backend.model.entity.enums.SituacionLaboral;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@DiscriminatorValue("GARANTE")
+@Table(name = "garante")
 @Getter
 @Setter
 @NoArgsConstructor

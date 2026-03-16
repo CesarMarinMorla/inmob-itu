@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@DiscriminatorValue("INTERNO")
+@Table(name = "rol_interno")
 @Getter
 @Setter
 @NoArgsConstructor
