@@ -20,9 +20,17 @@ public class RoleAssignmentService {
 
     @Transactional
     public PropietarioDTO asignarRolPropietario(Long personaId, PropietarioDTO dto) {
-        // 1. Buscamos la persona (física o jurídica no importa, PersonaRepository encuentra ambas)
+        // 1. Buscamos la persona
         Persona persona = personaRepository.findById(personaId)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró una persona con el ID: " + personaId));
+
+        // 1.5 REGLA DE NEGOCIO: Evitar duplicidad de roles del mismo tipo
+        boolean yaEsPropietario = persona.getRoles().stream()
+                .anyMatch(rol -> rol instanceof Propietario);
+        
+        if (yaEsPropietario) {
+            throw new IllegalStateException("La persona con ID " + personaId + " ya tiene asignado el rol de Propietario.");
+        }
 
         // 2. Mapeamos la Entidad Rol a partir del DTO
         Propietario propietario = new Propietario();
