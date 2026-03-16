@@ -2,6 +2,7 @@ package com.inmob2.backend.controller;
 
 import com.inmob2.backend.model.dto.PersonaJuridicaDTO;
 import com.inmob2.backend.service.PersonaJuridicaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PersonaJuridicaController {
     }
 
     @PostMapping
-    public ResponseEntity<PersonaJuridicaDTO> crearPersona(@RequestBody PersonaJuridicaDTO dto) {
+    public ResponseEntity<PersonaJuridicaDTO> crearPersona(@Valid @RequestBody PersonaJuridicaDTO dto) {
         PersonaJuridicaDTO personaGuardada = personaJuridicaService.guardar(dto);
         return new ResponseEntity<>(personaGuardada, HttpStatus.CREATED);
     }
