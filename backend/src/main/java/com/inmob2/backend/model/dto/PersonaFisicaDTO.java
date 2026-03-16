@@ -2,6 +2,8 @@ package com.inmob2.backend.model.dto;
 
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class PersonaFisicaDTO {
@@ -13,4 +15,10 @@ public class PersonaFisicaDTO {
     private String tipoDocumento;
     private String numDocumento;
     private LocalDate fechaNacimiento;
+
+    // Listas anidadas para proveer el modelo completo al Frontend
+    private List<DireccionPersonaDTO> direcciones = new ArrayList<>();
+    private List<TelefonoPersonaDTO> telefonos = new ArrayList<>();
+    private List<MailPersonaDTO> mails = new ArrayList<>();
 }
+
