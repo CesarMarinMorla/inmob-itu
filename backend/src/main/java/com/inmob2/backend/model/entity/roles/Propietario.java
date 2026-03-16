@@ -1,16 +1,19 @@
 package com.inmob2.backend.model.entity.roles;
 
 import com.inmob2.backend.model.entity.enums.CondicionIva;
+import com.inmob2.backend.model.entity.propiedad.Propiedad;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("PROPIETARIO")
@@ -35,7 +38,8 @@ public class Propietario extends RolExterno {
     @Column(name = "observaciones_propietario", length = 1000)
     private String observacionesPropietario;
 
-    // TODO: Descomentar e implementar cuando se defina la entidad Propiedad
-    // @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Propiedad> propiedades;
+    // Relación ManyToMany bidireccional mapeada por Propiedad
+    @ManyToMany(mappedBy = "dueniosLista")
+    private List<Propiedad> propiedades = new ArrayList<>();
 }
+
