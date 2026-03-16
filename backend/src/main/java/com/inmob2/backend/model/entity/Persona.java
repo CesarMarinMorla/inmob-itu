@@ -1,5 +1,6 @@
 package com.inmob2.backend.model.entity;
 
+import com.inmob2.backend.model.entity.roles.Rol;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ public abstract class Persona {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relaciones 1 a N, mapeadas por la propiedad en las clases hijas
+    // Relaciones 1 a N de Contacto
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DireccionPersona> direcciones = new ArrayList<>();
 
@@ -30,7 +31,12 @@ public abstract class Persona {
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MailPersona> mails = new ArrayList<>();
 
-    // Métodos utilitarios (Helper Methods) para mantener sincronía lado Padre / Hijo
+    // Relación 1 a N de Roles
+    @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rol> roles = new ArrayList<>();
+
+    // --- Helper Methods para Contacto ---
+
     public void addDireccion(DireccionPersona direccion) {
         direcciones.add(direccion);
         direccion.setPersona(this);
@@ -59,5 +65,16 @@ public abstract class Persona {
     public void removeMail(MailPersona mail) {
         mails.remove(mail);
         mail.setPersona(null);
+    }
+
+    // --- Helper Methods para Roles ---
+    public void addRol(Rol rol) {
+        roles.add(rol);
+        rol.setPersona(this);
+    }
+
+    public void removeRol(Rol rol) {
+        roles.remove(rol);
+        rol.setPersona(null);
     }
 }
