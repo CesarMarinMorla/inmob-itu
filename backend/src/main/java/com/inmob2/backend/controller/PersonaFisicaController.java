@@ -39,4 +39,10 @@ public class PersonaFisicaController {
             @Valid @RequestBody PersonaFisicaDTO dto) {
         return ResponseEntity.ok(personaFisicaService.actualizar(id, dto));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPersona(@PathVariable Long id) {
+        personaFisicaService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -62,6 +62,18 @@ public class PersonaFisicaService {
         return convertirADto(actualizada);
     }
 
+    @Transactional
+    public void eliminar(Long id) {
+        if (!personaFisicaRepository.existsById(id)) {
+            throw new IllegalArgumentException("No se encontró la persona con ID: " + id);
+        }
+        try {
+            personaFisicaRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new IllegalStateException("No se puede eliminar la persona porque tiene registros asociados (ej: es propietaria de un inmueble o tiene contratos activos).");
+        }
+    }
+
     private PersonaFisicaDTO convertirADto(PersonaFisica entidad) {
         PersonaFisicaDTO dto = new PersonaFisicaDTO();
         

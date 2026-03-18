@@ -31,6 +31,44 @@ public class PersonaJuridicaService {
         return convertirADto(guardada);
     }
 
+    @Transactional(readOnly = true)
+    public PersonaJuridicaDTO obtenerPorCuit(String cuit) {
+        return personaJuridicaRepository.findByCuit(cuit)
+                .map(this::convertirADto)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la empresa con CUIT: " + cuit));
+    }
+
+    @Transactional
+    public PersonaJuridicaDTO actualizar(Long id, PersonaJuridicaDTO dto) {
+        PersonaJuridica entidad = personaJuridicaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la persona jurídica con ID: " + id));
+
+        entidad.setRazonSocial(dto.getRazonSocial());
+        entidad.setCuit(dto.getCuit());
+        entidad.setNombreNegocio(dto.getNombreNegocio());
+        entidad.setFechaConstitucion(dto.getFechaConstitucion());
+
+        entidad.getMails().clear();
+        entidad.getTelefonos().clear();
+        entidad.getDirecciones().clear();
+        PersonaMapperUtils.mapearListasHaciaEntidad(dto, entidad);
+
+        PersonaJuridica actualizada = personaJuridicaRepository.save(entidad);
+        return convertirADto(actualizada);
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        if (!personaJuridicaRepository.existsById(id)) {
+            throw new IllegalArgumentException("No se encontró la empresa con ID: " + id);
+        }
+        try {
+            personaJuridicaRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new IllegalStateException("No se puede eliminar la empresa porque tiene registros asociados (ej: contratos, roles o propiedades).");
+        }
+    }
+
     private PersonaJuridicaDTO convertirADto(PersonaJuridica entidad) {
         PersonaJuridicaDTO dto = new PersonaJuridicaDTO();
         
