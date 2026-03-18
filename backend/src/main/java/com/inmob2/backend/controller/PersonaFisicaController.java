@@ -22,9 +22,27 @@ public class PersonaFisicaController {
         return ResponseEntity.ok(personaFisicaService.obtenerTodas());
     }
 
+    @GetMapping("/{dni}")
+    public ResponseEntity<PersonaFisicaDTO> obtenerPorDni(@PathVariable String dni) {
+        return ResponseEntity.ok(personaFisicaService.obtenerPorDni(dni));
+    }
+
     @PostMapping
     public ResponseEntity<PersonaFisicaDTO> crearPersona(@Valid @RequestBody PersonaFisicaDTO dto) {
         PersonaFisicaDTO personaGuardada = personaFisicaService.guardar(dto);
         return new ResponseEntity<>(personaGuardada, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonaFisicaDTO> actualizarPersona(
+            @PathVariable Long id, 
+            @Valid @RequestBody PersonaFisicaDTO dto) {
+        return ResponseEntity.ok(personaFisicaService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPersona(@PathVariable Long id) {
+        personaFisicaService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

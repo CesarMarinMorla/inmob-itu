@@ -22,9 +22,27 @@ public class PersonaJuridicaController {
         return ResponseEntity.ok(personaJuridicaService.obtenerTodas());
     }
 
+    @GetMapping("/cuit/{cuit}")
+    public ResponseEntity<PersonaJuridicaDTO> obtenerPorCuit(@PathVariable String cuit) {
+        return ResponseEntity.ok(personaJuridicaService.obtenerPorCuit(cuit));
+    }
+
     @PostMapping
     public ResponseEntity<PersonaJuridicaDTO> crearPersona(@Valid @RequestBody PersonaJuridicaDTO dto) {
         PersonaJuridicaDTO personaGuardada = personaJuridicaService.guardar(dto);
         return new ResponseEntity<>(personaGuardada, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonaJuridicaDTO> actualizarPersona(
+            @PathVariable Long id, 
+            @Valid @RequestBody PersonaJuridicaDTO dto) {
+        return ResponseEntity.ok(personaJuridicaService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPersona(@PathVariable Long id) {
+        personaJuridicaService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
