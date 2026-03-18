@@ -1,6 +1,6 @@
 package com.inmob2.backend.controller;
 
-import com.inmob2.backend.model.dto.roles.PropietarioDTO;
+import com.inmob2.backend.model.dto.roles.*;
 import com.inmob2.backend.service.RoleAssignmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,40 @@ public class RoleAssignmentController {
         PropietarioDTO rolAsignado = roleAssignmentService.asignarRolPropietario(personaId, dto);
         return new ResponseEntity<>(rolAsignado, HttpStatus.CREATED);
     }
-    
-    // Aquí a futuro agregaríamos /inquilino, /garante, /empleado, etc.
+
+    @PostMapping("/inquilino")
+    public ResponseEntity<InquilinoDTO> asignarRolInquilino(
+            @PathVariable Long personaId,
+            @Valid @RequestBody InquilinoDTO dto) {
+
+        InquilinoDTO rolAsignado = roleAssignmentService.asignarRolInquilino(personaId, dto);
+        return new ResponseEntity<>(rolAsignado, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/garante")
+    public ResponseEntity<GaranteDTO> asignarRolGarante(
+            @PathVariable Long personaId,
+            @Valid @RequestBody GaranteDTO dto) {
+
+        GaranteDTO rolAsignado = roleAssignmentService.asignarRolGarante(personaId, dto);
+        return new ResponseEntity<>(rolAsignado, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/empleado")
+    public ResponseEntity<EmpleadoDTO> asignarRolEmpleado(
+            @PathVariable Long personaId,
+            @Valid @RequestBody EmpleadoDTO dto) {
+
+        EmpleadoDTO rolAsignado = roleAssignmentService.asignarRolEmpleado(personaId, dto);
+        return new ResponseEntity<>(rolAsignado, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/administrador")
+    public ResponseEntity<AdministradorDTO> asignarRolAdministrador(
+            @PathVariable Long personaId,
+            @Valid @RequestBody AdministradorDTO dto) {
+
+        AdministradorDTO rolAsignado = roleAssignmentService.asignarRolAdministrador(personaId, dto);
+        return new ResponseEntity<>(rolAsignado, HttpStatus.CREATED);
+    }
 }
