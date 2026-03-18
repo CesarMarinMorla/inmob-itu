@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Box,
@@ -18,66 +18,77 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { Search, Add, Edit, Delete, Business, Person, Email, Phone, LocationOn } from '@mui/icons-material';
-import { getInquilinos, deleteInquilino, type Inquilino } from '../data/mockData';
+import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
+import { getPersonasFisicas, type PersonaFisica } from '../services/personasService';
 
 export default function InquilinosPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [inquilinos, setInquilinos] = useState<Inquilino[]>(getInquilinos());
+  const [inquilinos, setInquilinos] = useState<PersonaFisica[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | number | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
     severity: 'success',
   });
 
+  useEffect(() => {
+    loadInquilinos();
+  }, []);
+
+  const loadInquilinos = async () => {
+    const data = await getPersonasFisicas();
+    setInquilinos(data);
+  };
+
   const filteredInquilinos = inquilinos.filter((inq) => {
     const searchLower = searchTerm.toLowerCase();
-    const nombre = inq.tipo === 'persona' 
-      ? `${inq.primerNombre} ${inq.primerApellido}`
-      : inq.razonSocial || '';
-    const documento = inq.tipo === 'persona' ? inq.numeroDocumento : inq.cuit;
+    const nombre = `${inq.primerNombre} ${inq.primerApellido}`.toLowerCase();
+    const documento = inq.numDocumento;
+    const principalEmail = inq.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
     
     return (
-      nombre.toLowerCase().includes(searchLower) ||
+      nombre.includes(searchLower) ||
       documento?.includes(searchLower) ||
-      inq.email.toLowerCase().includes(searchLower)
+      principalEmail.includes(searchLower)
     );
   });
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string | number | undefined) => {
+    if (!id) return;
     setSelectedId(id);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = () => {
-    if (selectedId) {
-      const success = deleteInquilino(selectedId);
-      if (success) {
-        setInquilinos(getInquilinos());
-        setSnackbar({ open: true, message: 'Inquilino eliminado exitosamente', severity: 'success' });
-      } else {
-        setSnackbar({ open: true, message: 'Error al eliminar el inquilino', severity: 'error' });
-      }
-    }
+    // Por ahora la eliminación no está implementada en el backend según los requerimientos
+    // Podemos simular el borrado localmente o mostrar un mensaje
+    setSnackbar({ open: true, message: 'La eliminación de Personas Físicas estará disponible próximamente', severity: 'error' });
     setDeleteDialogOpen(false);
     setSelectedId(null);
   };
 
-  const getNombreCompleto = (inq: Inquilino): string => {
-    if (inq.tipo === 'persona') {
-      return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
-    }
-    return inq.razonSocial || '';
+  const getNombreCompleto = (inq: PersonaFisica): string => {
+    return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
   };
 
-  const getDocumento = (inq: Inquilino): string => {
-    if (inq.tipo === 'persona') {
-      return `${inq.tipoDocumento || 'DNI'} ${inq.numeroDocumento || ''}`;
-    }
-    return `CUIT ${inq.cuit || ''}`;
+  const getDocumento = (inq: PersonaFisica): string => {
+    return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
+  };
+
+  const getPrincipalEmail = (inq: PersonaFisica): string => {
+    return inq.mails?.find(m => m.esPrincipal)?.email || 'Sin email';
+  };
+
+  const getPrincipalTelefono = (inq: PersonaFisica): string => {
+    return inq.telefonos?.[0]?.numero || 'Sin teléfono';
+  };
+
+  const getDireccionPrincipal = (inq: PersonaFisica): string => {
+    const dir = inq.direcciones?.[0];
+    if (!dir) return 'Sin dirección';
+    return `${dir.calle || ''} ${dir.altura || ''}, ${dir.localidad || ''}`.trim();
   };
 
   return (
@@ -151,11 +162,7 @@ export default function InquilinosPage() {
                     justifyContent: 'center',
                   }}
                 >
-                  {inq.tipo === 'empresa' ? (
-                    <Business sx={{ fontSize: 32, color: 'text.secondary' }} />
-                  ) : (
-                    <Person sx={{ fontSize: 32, color: 'text.secondary' }} />
-                  )}
+                  <Person sx={{ fontSize: 32, color: 'text.secondary' }} />
                 </Box>
 
                 <Box sx={{ flex: 1, minWidth: 200 }}>
@@ -167,9 +174,9 @@ export default function InquilinosPage() {
                   </Typography>
                   <Box sx={{ mt: 1 }}>
                     <Chip
-                      label={inq.tipo === 'empresa' ? 'Empresa' : 'Persona Física'}
+                      label="Persona Física"
                       size="small"
-                      color={inq.tipo === 'empresa' ? 'secondary' : 'default'}
+                      color="default"
                     />
                   </Box>
                 </Box>
@@ -178,19 +185,19 @@ export default function InquilinosPage() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <LocationOn sx={{ fontSize: 20, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
-                      {inq.direccion}, {inq.localidad}
+                      {getDireccionPrincipal(inq)}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Email sx={{ fontSize: 20, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
-                      {inq.email}
+                      {getPrincipalEmail(inq)}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Phone sx={{ fontSize: 20, color: 'success.main' }} />
                     <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
-                      {inq.telefono}
+                      {getPrincipalTelefono(inq)}
                     </Typography>
                   </Box>
                 </Box>

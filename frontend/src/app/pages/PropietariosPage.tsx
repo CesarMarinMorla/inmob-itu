@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Box,
@@ -19,66 +19,76 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { Search, Add, Edit, Delete, Business, Person, Email, Phone, LocationOn } from '@mui/icons-material';
-import { getPropietarios, deletePropietario, type Propietario } from '../data/mockData';
+import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
+import { getPersonasFisicas, type PersonaFisica } from '../services/personasService';
 
 export default function PropietariosPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [propietarios, setPropietarios] = useState<Propietario[]>(getPropietarios());
+  const [propietarios, setPropietarios] = useState<PersonaFisica[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | number | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
     severity: 'success',
   });
 
+  useEffect(() => {
+    loadPropietarios();
+  }, []);
+
+  const loadPropietarios = async () => {
+    const data = await getPersonasFisicas();
+    setPropietarios(data);
+  };
+
   const filteredPropietarios = propietarios.filter((prop) => {
     const searchLower = searchTerm.toLowerCase();
-    const nombre = prop.tipo === 'persona' 
-      ? `${prop.primerNombre} ${prop.primerApellido}`
-      : prop.razonSocial || '';
-    const documento = prop.tipo === 'persona' ? prop.numeroDocumento : prop.cuit;
+    const nombre = `${prop.primerNombre} ${prop.primerApellido}`.toLowerCase();
+    const documento = prop.numDocumento;
+    const principalEmail = prop.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
     
     return (
-      nombre.toLowerCase().includes(searchLower) ||
+      nombre.includes(searchLower) ||
       documento?.includes(searchLower) ||
-      prop.email.toLowerCase().includes(searchLower)
+      principalEmail.includes(searchLower)
     );
   });
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string | number | undefined) => {
+    if (!id) return;
     setSelectedId(id);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = () => {
-    if (selectedId) {
-      const success = deletePropietario(selectedId);
-      if (success) {
-        setPropietarios(getPropietarios());
-        setSnackbar({ open: true, message: 'Propietario eliminado exitosamente', severity: 'success' });
-      } else {
-        setSnackbar({ open: true, message: 'Error al eliminar el propietario', severity: 'error' });
-      }
-    }
+    // Por ahora la eliminación no está implementada en el backend
+    setSnackbar({ open: true, message: 'La eliminación de Personas Físicas estará disponible próximamente', severity: 'error' });
     setDeleteDialogOpen(false);
     setSelectedId(null);
   };
 
-  const getNombreCompleto = (prop: Propietario): string => {
-    if (prop.tipo === 'persona') {
-      return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
-    }
-    return prop.razonSocial || '';
+  const getNombreCompleto = (prop: PersonaFisica): string => {
+    return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
   };
 
-  const getDocumento = (prop: Propietario): string => {
-    if (prop.tipo === 'persona') {
-      return `${prop.tipoDocumento || 'DNI'} ${prop.numeroDocumento || ''}`;
-    }
-    return `CUIT ${prop.cuit || ''}`;
+  const getDocumento = (prop: PersonaFisica): string => {
+    return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+  };
+
+  const getPrincipalEmail = (prop: PersonaFisica): string => {
+    return prop.mails?.find(m => m.esPrincipal)?.email || 'Sin email';
+  };
+
+  const getPrincipalTelefono = (prop: PersonaFisica): string => {
+    return prop.telefonos?.[0]?.numero || 'Sin teléfono';
+  };
+
+  const getDireccionPrincipal = (prop: PersonaFisica): string => {
+    const dir = prop.direcciones?.[0];
+    if (!dir) return 'Sin dirección';
+    return `${dir.calle || ''} ${dir.altura || ''}, ${dir.localidad || ''}`.trim();
   };
 
   return (
@@ -152,11 +162,7 @@ export default function PropietariosPage() {
                     justifyContent: 'center',
                   }}
                 >
-                  {prop.tipo === 'empresa' ? (
-                    <Business sx={{ fontSize: 32, color: 'text.secondary' }} />
-                  ) : (
-                    <Person sx={{ fontSize: 32, color: 'text.secondary' }} />
-                  )}
+                  <Person sx={{ fontSize: 32, color: 'text.secondary' }} />
                 </Box>
 
                 <Box sx={{ flex: 1, minWidth: 200 }}>
@@ -168,9 +174,9 @@ export default function PropietariosPage() {
                   </Typography>
                   <Box sx={{ mt: 1 }}>
                     <Chip
-                      label={prop.tipo === 'empresa' ? 'Empresa' : 'Persona Física'}
+                      label="Persona Física"
                       size="small"
-                      color={prop.tipo === 'empresa' ? 'secondary' : 'default'}
+                      color="default"
                     />
                   </Box>
                 </Box>
@@ -179,19 +185,19 @@ export default function PropietariosPage() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <LocationOn sx={{ fontSize: 20, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
-                      {prop.direccion}, {prop.localidad}
+                      {getDireccionPrincipal(prop)}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Email sx={{ fontSize: 20, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
-                      {prop.email}
+                      {getPrincipalEmail(prop)}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Phone sx={{ fontSize: 20, color: 'success.main' }} />
                     <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
-                      {prop.telefono}
+                      {getPrincipalTelefono(prop)}
                     </Typography>
                   </Box>
                 </Box>

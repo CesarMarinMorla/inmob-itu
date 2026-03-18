@@ -15,9 +15,12 @@ import {
   Alert,
   Breadcrumbs,
   Link,
+  IconButton,
+  Radio,
+  FormControlLabel,
 } from '@mui/material';
-import { Business, Person, ArrowBack } from '@mui/icons-material';
-import { createPropietario } from '../data/mockData';
+import { Business, Person, ArrowBack, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { createPersonaFisica, type Telefono, type Mail, type Direccion, type PersonaFisica } from '../services/personasService';
 
 export default function NuevoPropietarioPage() {
   const navigate = useNavigate();
@@ -37,17 +40,20 @@ export default function NuevoPropietarioPage() {
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
 
-  // Campos para empresa
-  const [razonSocial, setRazonSocial] = useState('');
-  const [cuit, setCuit] = useState('');
+  // Campos dinámicos para teléfonos y mails
+  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
+  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
 
-  // Campos comunes
-  const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [direccion, setDireccion] = useState('');
+  // Campos para dirección expandidos
+  const [calle, setCalle] = useState('');
+  const [altura, setAltura] = useState('');
+  const [piso, setPiso] = useState('');
+  const [departamento, setDepartamento] = useState('');
+  const [barrio, setBarrio] = useState('');
   const [provincia, setProvincia] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
+  const [tipoDomicilio, setTipoDomicilio] = useState<'PARTICULAR' | 'LABORAL' | 'OTRO'>('PARTICULAR');
 
   const provinciasArgentinas = [
     'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -57,48 +63,80 @@ export default function NuevoPropietarioPage() {
     'Tierra del Fuego', 'Tucumán',
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddTelefono = () => {
+    setTelefonos([...telefonos, { numero: '', tipo: 'CELULAR' }]);
+  };
 
-    // Validaciones básicas
-    if (!email || !telefono || !direccion || !provincia || !localidad) {
-      setSnackbar({ open: true, message: 'Por favor complete todos los campos obligatorios', severity: 'error' });
-      return;
+  const handleRemoveTelefono = (index: number) => {
+    setTelefonos(telefonos.filter((_, i) => i !== index));
+  };
+
+  const handleTelefonoChange = (index: number, field: keyof Telefono, value: string) => {
+    const newTelefonos = [...telefonos];
+    newTelefonos[index] = { ...newTelefonos[index], [field]: value };
+    setTelefonos(newTelefonos);
+  };
+
+  const handleAddMail = () => {
+    setMails([...mails, { email: '', tipo: 'PERSONAL', esPrincipal: mails.length === 0 }]);
+  };
+
+  const handleRemoveMail = (index: number) => {
+    const newMails = mails.filter((_, i) => i !== index);
+    if (mails[index].esPrincipal && newMails.length > 0) {
+      newMails[0].esPrincipal = true;
     }
+    setMails(newMails);
+  };
+
+  const handleMailChange = (index: number, field: keyof Mail, value: string | boolean) => {
+    const newMails = [...mails];
+    if (field === 'esPrincipal' && value === true) {
+      newMails.forEach(m => m.esPrincipal = false);
+    }
+    newMails[index] = { ...newMails[index], [field]: value };
+    setMails(newMails);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (tipo === 'persona' && (!primerNombre || !primerApellido || !numeroDocumento)) {
       setSnackbar({ open: true, message: 'Por favor complete nombre, apellido y documento', severity: 'error' });
       return;
     }
 
-    if (tipo === 'empresa' && (!razonSocial || !cuit)) {
-      setSnackbar({ open: true, message: 'Por favor complete razón social y CUIT', severity: 'error' });
-      return;
+    const personaData: PersonaFisica = {
+      primerNombre,
+      segundoNombre,
+      primerApellido,
+      segundoApellido,
+      tipoDocumento,
+      numDocumento: numeroDocumento,
+      fechaNacimiento,
+      telefonos: telefonos.filter(t => t.numero.trim() !== ''),
+      mails: mails.filter(m => m.email.trim() !== ''),
+      direcciones: [{
+        calle,
+        altura,
+        piso,
+        departamento,
+        barrio,
+        localidad,
+        provincia,
+        codigoPostal,
+        tipoDomicilio
+      }]
+    };
+
+    const result = await createPersonaFisica(personaData);
+
+    if (result) {
+      setSnackbar({ open: true, message: 'Propietario creado exitosamente', severity: 'success' });
+      setTimeout(() => navigate('/propietarios'), 1500);
+    } else {
+      setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
     }
-
-    const nuevoPropietario = createPropietario({
-      tipo,
-      primerNombre: tipo === 'persona' ? primerNombre : undefined,
-      segundoNombre: tipo === 'persona' ? segundoNombre : undefined,
-      primerApellido: tipo === 'persona' ? primerApellido : undefined,
-      segundoApellido: tipo === 'persona' ? segundoApellido : undefined,
-      tipoDocumento: tipo === 'persona' ? tipoDocumento : undefined,
-      numeroDocumento: tipo === 'persona' ? numeroDocumento : undefined,
-      fechaNacimiento: tipo === 'persona' ? fechaNacimiento : undefined,
-      razonSocial: tipo === 'empresa' ? razonSocial : undefined,
-      cuit: tipo === 'empresa' ? cuit : undefined,
-      email,
-      telefono,
-      direccion,
-      provincia,
-      localidad,
-      codigoPostal,
-      inmuebles: [],
-      inquilinos: [],
-    });
-
-    setSnackbar({ open: true, message: 'Propietario creado exitosamente', severity: 'success' });
-    setTimeout(() => navigate('/propietarios'), 1500);
   };
 
   return (
@@ -149,9 +187,9 @@ export default function NuevoPropietarioPage() {
                   <Person sx={{ mr: 1 }} />
                   Persona Física
                 </ToggleButton>
-                <ToggleButton value="empresa" aria-label="Empresa">
+                <ToggleButton value="empresa" aria-label="Empresa" disabled>
                   <Business sx={{ mr: 1 }} />
-                  Empresa
+                  Empresa (Próximamente)
                 </ToggleButton>
               </ToggleButtonGroup>
             </Box>
@@ -259,64 +297,171 @@ export default function NuevoPropietarioPage() {
                 <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
                   Datos de la Empresa
                 </Typography>
-                <TextField
-                  fullWidth
-                  label="Razón Social"
-                  value={razonSocial}
-                  onChange={(e) => setRazonSocial(e.target.value)}
-                  required
-                  sx={{ mb: 2 }}
-                  inputProps={{ 'aria-required': 'true' }}
-                />
-                <TextField
-                  fullWidth
-                  label="CUIT"
-                  value={cuit}
-                  onChange={(e) => setCuit(e.target.value)}
-                  placeholder="XX-XXXXXXXX-X"
-                  required
-                  sx={{ mb: 3 }}
-                  inputProps={{ 'aria-required': 'true' }}
-                />
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  El registro de empresas o personas jurídicas estará disponible próximamente.
+                </Typography>
               </>
             )}
 
-            <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, mt: 3, fontWeight: 600 }}>
               Información de Contacto
             </Typography>
-            <TextField
-              fullWidth
-              type="email"
-              label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              sx={{ mb: 2 }}
-              inputProps={{ 'aria-required': 'true' }}
-            />
-            <TextField
-              fullWidth
-              label="Teléfono"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              placeholder="+54 9 XXX XXX XXXX"
-              required
-              sx={{ mb: 3 }}
-              inputProps={{ 'aria-required': 'true' }}
-            />
+            
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Teléfonos</Typography>
+              {telefonos.map((tel, index) => (
+                <Grid container spacing={2} sx={{ mb: 2 }} key={`tel-${index}`}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Número de teléfono"
+                      value={tel.numero}
+                      onChange={(e) => handleTelefonoChange(index, 'numero', e.target.value)}
+                      placeholder="+54 9 XXX XXX XXXX"
+                      required={index === 0}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Tipo"
+                      value={tel.tipo}
+                      onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'CELULAR' | 'FIJO')}
+                    >
+                      <MenuItem value="CELULAR">Celular</MenuItem>
+                      <MenuItem value="FIJO">Fijo</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                    {index > 0 && (
+                      <IconButton color="error" onClick={() => handleRemoveTelefono(index)}>
+                        <RemoveCircleOutline />
+                      </IconButton>
+                    )}
+                    {index === telefonos.length - 1 && (
+                      <IconButton color="primary" onClick={handleAddTelefono}>
+                        <AddCircleOutline />
+                      </IconButton>
+                    )}
+                  </Grid>
+                </Grid>
+              ))}
+            </Box>
+
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Mails</Typography>
+              {mails.map((mail, index) => (
+                <Grid container spacing={2} sx={{ mb: 2 }} key={`mail-${index}`}>
+                  <Grid size={{ xs: 12, sm: 5 }}>
+                    <TextField
+                      fullWidth
+                      type="email"
+                      label="Correo electrónico"
+                      value={mail.email}
+                      onChange={(e) => handleMailChange(index, 'email', e.target.value)}
+                      required={index === 0}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 3 }}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Tipo"
+                      value={mail.tipo}
+                      onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'PERSONAL' | 'LABORAL')}
+                    >
+                      <MenuItem value="PERSONAL">Personal</MenuItem>
+                      <MenuItem value="LABORAL">Laboral</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FormControlLabel
+                      value="principal"
+                      control={<Radio checked={mail.esPrincipal} onChange={() => handleMailChange(index, 'esPrincipal', true)} />}
+                      label="Principal"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    {index > 0 && (
+                      <IconButton color="error" onClick={() => handleRemoveMail(index)}>
+                        <RemoveCircleOutline />
+                      </IconButton>
+                    )}
+                    {index === mails.length - 1 && (
+                      <IconButton color="primary" onClick={handleAddMail}>
+                        <AddCircleOutline />
+                      </IconButton>
+                    )}
+                  </Grid>
+                </Grid>
+              ))}
+            </Box>
 
             <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
               Dirección
             </Typography>
-            <TextField
-              fullWidth
-              label="Calle y número"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              required
-              sx={{ mb: 2 }}
-              inputProps={{ 'aria-required': 'true' }}
-            />
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Calle"
+                  value={calle}
+                  onChange={(e) => setCalle(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  fullWidth
+                  label="Altura"
+                  value={altura}
+                  onChange={(e) => setAltura(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Tipo de Domicilio"
+                  value={tipoDomicilio}
+                  onChange={(e) => setTipoDomicilio(e.target.value as 'PARTICULAR' | 'LABORAL' | 'OTRO')}
+                >
+                  <MenuItem value="PARTICULAR">Particular</MenuItem>
+                  <MenuItem value="LABORAL">Laboral</MenuItem>
+                  <MenuItem value="OTRO">Otro</MenuItem>
+                </TextField>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Piso"
+                  value={piso}
+                  onChange={(e) => setPiso(e.target.value)}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Departamento"
+                  value={departamento}
+                  onChange={(e) => setDepartamento(e.target.value)}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Barrio"
+                  value={barrio}
+                  onChange={(e) => setBarrio(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+            
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
@@ -341,7 +486,6 @@ export default function NuevoPropietarioPage() {
                   value={localidad}
                   onChange={(e) => setLocalidad(e.target.value)}
                   required
-                  inputProps={{ 'aria-required': 'true' }}
                 />
               </Grid>
             </Grid>
