@@ -31,6 +31,37 @@ public class PersonaFisicaService {
         return convertirADto(guardada);
     }
 
+    @Transactional(readOnly = true)
+    public PersonaFisicaDTO obtenerPorDni(String dni) {
+        return personaFisicaRepository.findByNumDocumento(dni)
+                .map(this::convertirADto)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la persona con DNI: " + dni));
+    }
+
+    @Transactional
+    public PersonaFisicaDTO actualizar(Long id, PersonaFisicaDTO dto) {
+        PersonaFisica entidad = personaFisicaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la persona con ID: " + id));
+
+        // Actualizamos datos básicos
+        entidad.setPrimerNombre(dto.getPrimerNombre());
+        entidad.setSegundoNombre(dto.getSegundoNombre());
+        entidad.setPrimerApellido(dto.getPrimerApellido());
+        entidad.setSegundoApellido(dto.getSegundoApellido());
+        entidad.setTipoDocumento(dto.getTipoDocumento());
+        entidad.setNumDocumento(dto.getNumDocumento());
+        entidad.setFechaNacimiento(dto.getFechaNacimiento());
+
+        // Para actualizar colecciones con orphanRemoval=true, limpiamos y re-mapeamos
+        entidad.getMails().clear();
+        entidad.getTelefonos().clear();
+        entidad.getDirecciones().clear();
+        PersonaMapperUtils.mapearListasHaciaEntidad(dto, entidad);
+
+        PersonaFisica actualizada = personaFisicaRepository.save(entidad);
+        return convertirADto(actualizada);
+    }
+
     private PersonaFisicaDTO convertirADto(PersonaFisica entidad) {
         PersonaFisicaDTO dto = new PersonaFisicaDTO();
         
