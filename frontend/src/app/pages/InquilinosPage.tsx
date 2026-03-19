@@ -19,7 +19,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
-import { getPersonasFisicas, type PersonaFisica } from '../services/personasService';
+import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica } from '../services/personasService';
 
 export default function InquilinosPage() {
   const navigate = useNavigate();
@@ -61,10 +61,15 @@ export default function InquilinosPage() {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
-    // Por ahora la eliminación no está implementada en el backend según los requerimientos
-    // Podemos simular el borrado localmente o mostrar un mensaje
-    setSnackbar({ open: true, message: 'La eliminación de Personas Físicas estará disponible próximamente', severity: 'error' });
+  const confirmDelete = async () => {
+    if (!selectedId) return;
+    const success = await deletePersonaFisica(selectedId.toString());
+    if (success) {
+      setSnackbar({ open: true, message: 'Inquilino eliminado exitosamente', severity: 'success' });
+      loadInquilinos();
+    } else {
+      setSnackbar({ open: true, message: 'Error al eliminar el inquilino', severity: 'error' });
+    }
     setDeleteDialogOpen(false);
     setSelectedId(null);
   };
@@ -207,7 +212,7 @@ export default function InquilinosPage() {
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => navigate(`/inquilinos/${inq.id}/editar`)}
+                  onClick={() => navigate(`/inquilinos/${inq.numDocumento}/editar`)}
                   startIcon={<Edit />}
                   aria-label={`Editar ${getNombreCompleto(inq)}`}
                 >

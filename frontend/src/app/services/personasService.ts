@@ -69,3 +69,55 @@ export const createPersonaFisica = async (persona: PersonaFisica): Promise<Perso
     return null;
   }
 };
+
+
+export const getPersonaFisicaByDni = async (dni: string): Promise<PersonaFisica | null> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/personas-fisicas/${dni}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error al obtener persona física con DNI ${dni}:`, error);
+    return null;
+  }
+};
+
+export const updatePersonaFisica = async (id: number | string, persona: PersonaFisica): Promise<PersonaFisica | null> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/personas-fisicas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(persona),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error al actualizar persona física con ID ${id}:`, error);
+    return null;
+  }
+};
+
+export const deletePersonaFisica = async (id: number | string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/personas-fisicas/${id}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return true;
+  } catch (error) {
+    console.error(`Error al eliminar persona física con ID ${id}:`, error);
+    return false;
+  }
+};
+

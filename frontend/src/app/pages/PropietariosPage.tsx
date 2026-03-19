@@ -20,7 +20,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
-import { getPersonasFisicas, type PersonaFisica } from '../services/personasService';
+import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica } from '../services/personasService';
 
 export default function PropietariosPage() {
   const navigate = useNavigate();
@@ -62,9 +62,15 @@ export default function PropietariosPage() {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
-    // Por ahora la eliminación no está implementada en el backend
-    setSnackbar({ open: true, message: 'La eliminación de Personas Físicas estará disponible próximamente', severity: 'error' });
+  const confirmDelete = async () => {
+    if (!selectedId) return;
+    const success = await deletePersonaFisica(selectedId.toString());
+    if (success) {
+      setSnackbar({ open: true, message: 'Propietario eliminado exitosamente', severity: 'success' });
+      loadPropietarios();
+    } else {
+      setSnackbar({ open: true, message: 'Error al eliminar el propietario', severity: 'error' });
+    }
     setDeleteDialogOpen(false);
     setSelectedId(null);
   };
@@ -207,7 +213,7 @@ export default function PropietariosPage() {
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => navigate(`/propietarios/${prop.id}/editar`)}
+                  onClick={() => navigate(`/propietarios/${prop.numDocumento}/editar`)}
                   startIcon={<Edit />}
                   aria-label={`Editar ${getNombreCompleto(prop)}`}
                 >
