@@ -25,7 +25,7 @@ public abstract class Propiedad {
     @Column(name = "codigo_referencia", nullable = false, unique = true, length = 50)
     private String codigoRef;
 
-    @Column(name = "codigo_catastral", length = 100)
+    @Column(name = "codigo_catastral", unique = true, length = 100)
     private String codigoCatastral;
 
     @Enumerated(EnumType.STRING)

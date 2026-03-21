@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Propietario extends RolExterno {
 
-    @Column(name = "cuit_cuil", length = 20)
+    @Column(name = "cuit_cuil", unique = true, length = 20)
     private String cuitCuil;
 
     @Enumerated(EnumType.STRING)
