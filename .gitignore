@@ -1,4 +1,39 @@
-# Node.js (Frontend)
+# --- IDEs and System ---
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.DS_Store
+*.swp
+*.swo
+out/
+
+# --- Java / Spring Boot (Backend) ---
+backend/target/
+backend/build/
+backend/bin/
+backend/out/
+backend/.gradle/
+backend/.mvn/
+!backend/.mvn/wrapper/maven-wrapper.properties
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/logs/
+backend/*.log
+backend/.metadata
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings
+backend/.springBeans
+backend/.sts4-cache
+backend/HELP.md
+
+
+# --- Node.js / React (Frontend - keeping for future use) ---
 frontend/node_modules/
 frontend/dist/
 frontend/.env
@@ -6,35 +41,15 @@ frontend/.env.local
 frontend/.env.*.local
 frontend/.vite/
 
-# Java/Spring Boot (Backend)
-backend/target/
-backend/*.jar
-backend/*.war
-backend/*.ear
-backend/logs/
-backend/*.log
-backend/.mvn/wrapper/maven-wrapper.jar
-backend/.metadata
-backend/bin/
-backend/build/
-
-# IDEs
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Logs
+# --- Logs & Temp ---
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Other
-database/seeds.sql
 scripts/*.tmp
-out/
+
+# --- Other ---
+database/seeds.sql
 public/build/
 *.tsbuildinfo
