@@ -32,6 +32,8 @@ import { Business, Person, ArrowBack, Delete, Add, AddCircleOutline, RemoveCircl
 import {
   getPersonaFisicaByDni,
   updatePersonaFisica,
+  getPersonaJuridicaByCuit,
+  updatePersonaJuridica,
   type Telefono,
   type Mail,
   type Direccion,
@@ -66,6 +68,8 @@ export default function EditarInquilinoPage() {
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
   const [cuit, setCuit] = useState('');
+  const [fechaConstitucion, setFechaConstitucion] = useState('');
+  const [nombreNegocio, setNombreNegocio] = useState('');
   // const [email, setEmail] = useState(''); // Removed
   const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
   const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
@@ -129,17 +133,32 @@ export default function EditarInquilinoPage() {
   useEffect(() => {
     const loadInquilino = async () => {
       if (id) {
-        const inquilino = await getPersonaFisicaByDni(id);
+        let isEmpresa = false;
+        let inquilino: any = await getPersonaFisicaByDni(id);
+        
+        if (!inquilino) {
+          inquilino = await getPersonaJuridicaByCuit(id);
+          isEmpresa = !!inquilino;
+        }
+
         if (inquilino) {
           if (inquilino.id) setPersonaId(inquilino.id);
-          setTipo('persona');
-          setPrimerNombre(inquilino.primerNombre || '');
-          setSegundoNombre(inquilino.segundoNombre || '');
-          setPrimerApellido(inquilino.primerApellido || '');
-          setSegundoApellido(inquilino.segundoApellido || '');
-          setTipoDocumento(inquilino.tipoDocumento || 'DNI');
-          setNumeroDocumento(inquilino.numDocumento || '');
-          setFechaNacimiento(inquilino.fechaNacimiento || '');
+          setTipo(isEmpresa ? 'empresa' : 'persona');
+          
+          if (isEmpresa) {
+              setRazonSocial(inquilino.razonSocial || '');
+              setCuit(inquilino.cuit || '');
+              setFechaConstitucion(inquilino.fechaConstitucion || '');
+              setNombreNegocio(inquilino.nombreNegocio || '');
+          } else {
+              setPrimerNombre(inquilino.primerNombre || '');
+              setSegundoNombre(inquilino.segundoNombre || '');
+              setPrimerApellido(inquilino.primerApellido || '');
+              setSegundoApellido(inquilino.segundoApellido || '');
+              setTipoDocumento(inquilino.tipoDocumento || 'DNI');
+              setNumeroDocumento(inquilino.numDocumento || '');
+              setFechaNacimiento(inquilino.fechaNacimiento || '');
+          }
           
           if (inquilino.telefonos && inquilino.telefonos.length > 0) {
             setTelefonos(inquilino.telefonos);
@@ -181,20 +200,17 @@ export default function EditarInquilinoPage() {
       return;
     }
 
+    if (tipo === 'empresa' && (!razonSocial || !cuit)) {
+      setSnackbar({ open: true, message: 'Por favor complete razón social y CUIT', severity: 'error' });
+      return;
+    }
+
     if (!personaId) {
       setSnackbar({ open: true, message: 'Error: No se encontró el ID interno del inquilino', severity: 'error' });
       return;
     }
 
-    const personaData = {
-      tipo,
-      primerNombre,
-      segundoNombre,
-      primerApellido,
-      segundoApellido,
-      tipoDocumento,
-      numDocumento: numeroDocumento,
-      fechaNacimiento,
+    const commonData = {
       telefonos: telefonos.filter(t => t.numero.trim() !== ''),
       mails: mails.filter(m => m.email.trim() !== ''),
       direcciones: [{
@@ -210,7 +226,30 @@ export default function EditarInquilinoPage() {
       }]
     };
 
-    const updated = await updatePersonaFisica(personaId, personaData as any);
+    let updated = null;
+
+    if (tipo === 'persona') {
+        const personaData = {
+          ...commonData,
+          primerNombre,
+          segundoNombre,
+          primerApellido,
+          segundoApellido,
+          tipoDocumento,
+          numDocumento: numeroDocumento,
+          fechaNacimiento,
+        };
+        updated = await updatePersonaFisica(personaId, personaData as any);
+    } else {
+        const empresaData = {
+          ...commonData,
+          razonSocial,
+          cuit,
+          fechaConstitucion,
+          nombreNegocio,
+        };
+        updated = await updatePersonaJuridica(personaId, empresaData as any);
+    }
 
     if (updated) {
       setSnackbar({ open: true, message: 'Inquilino actualizado exitosamente', severity: 'success' });
@@ -407,23 +446,47 @@ export default function EditarInquilinoPage() {
                     <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
                       Datos de la Empresa
                     </Typography>
-                    <TextField
-                      fullWidth
-                      label="Razón Social"
-                      value={razonSocial}
-                      onChange={(e) => setRazonSocial(e.target.value)}
-                      required
-                      sx={{ mb: 2 }}
-                    />
-                    <TextField
-                      fullWidth
-                      label="CUIT"
-                      value={cuit}
-                      onChange={(e) => setCuit(e.target.value)}
-                      placeholder="XX-XXXXXXXX-X"
-                      required
-                      sx={{ mb: 3 }}
-                    />
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                          fullWidth
+                          label="Razón Social"
+                          value={razonSocial}
+                          onChange={(e) => setRazonSocial(e.target.value)}
+                          required
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                          fullWidth
+                          label="Nombre comercial (opcional)"
+                          value={nombreNegocio}
+                          onChange={(e) => setNombreNegocio(e.target.value)}
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                          fullWidth
+                          label="CUIT"
+                          value={cuit}
+                          onChange={(e) => setCuit(e.target.value)}
+                          placeholder="XX-XXXXXXXX-X"
+                          required
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                          fullWidth
+                          type="date"
+                          label="Fecha de Constitución"
+                          value={fechaConstitucion}
+                          onChange={(e) => setFechaConstitucion(e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </Grid>
+                    </Grid>
                   </>
                 )}
 

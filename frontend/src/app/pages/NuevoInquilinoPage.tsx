@@ -20,7 +20,14 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Business, Person, ArrowBack, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
-import { createPersonaFisica, type Telefono, type Mail, type Direccion, type PersonaFisica } from '../services/personasService';
+import {
+  createPersonaFisica,
+  createPersonaJuridica,
+  type Telefono,
+  type Mail,
+  type PersonaFisica,
+  type PersonaJuridica,
+} from '../services/personasService';
 
 export default function NuevoInquilinoPage() {
   const navigate = useNavigate();
@@ -31,6 +38,7 @@ export default function NuevoInquilinoPage() {
     severity: 'success',
   });
 
+  // Campos persona física
   const [primerNombre, setPrimerNombre] = useState('');
   const [segundoNombre, setSegundoNombre] = useState('');
   const [primerApellido, setPrimerApellido] = useState('');
@@ -38,9 +46,18 @@ export default function NuevoInquilinoPage() {
   const [tipoDocumento, setTipoDocumento] = useState<'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte'>('DNI');
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
+
+  // Campos persona jurídica
+  const [razonSocial, setRazonSocial] = useState('');
+  const [nombreNegocio, setNombreNegocio] = useState('');
+  const [cuit, setCuit] = useState('');
+  const [fechaConstitucion, setFechaConstitucion] = useState('');
+
+  // Campos comunes de contacto
   const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
   const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
-  
+
+  // Dirección
   const [calle, setCalle] = useState('');
   const [altura, setAltura] = useState('');
   const [piso, setPiso] = useState('');
@@ -94,44 +111,66 @@ export default function NuevoInquilinoPage() {
     setMails(newMails);
   };
 
+  const buildDireccion = () => ({
+    calle,
+    altura,
+    piso,
+    departamento,
+    barrio,
+    localidad,
+    provincia,
+    codigoPostal,
+    tipoDomicilio,
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (tipo === 'persona' && (!primerNombre || !primerApellido || !numeroDocumento)) {
-      setSnackbar({ open: true, message: 'Por favor complete nombre, apellido y documento', severity: 'error' });
-      return;
-    }
-
-    const personaData: PersonaFisica = {
-      primerNombre,
-      segundoNombre,
-      primerApellido,
-      segundoApellido,
-      tipoDocumento,
-      numDocumento: numeroDocumento,
-      fechaNacimiento,
-      telefonos: telefonos.filter(t => t.numero.trim() !== ''),
-      mails: mails.filter(m => m.email.trim() !== ''),
-      direcciones: [{
-        calle,
-        altura,
-        piso,
-        departamento,
-        barrio,
-        localidad,
-        provincia,
-        codigoPostal,
-        tipoDomicilio
-      }]
-    };
-
-    const result = await createPersonaFisica(personaData);
-    
-    if (result) {
-      setSnackbar({ open: true, message: 'Inquilino creado exitosamente', severity: 'success' });
-      setTimeout(() => navigate('/inquilinos'), 1500);
+    if (tipo === 'persona') {
+      if (!primerNombre || !primerApellido || !numeroDocumento) {
+        setSnackbar({ open: true, message: 'Por favor complete nombre, apellido y documento', severity: 'error' });
+        return;
+      }
+      const personaData: PersonaFisica = {
+        primerNombre,
+        segundoNombre,
+        primerApellido,
+        segundoApellido,
+        tipoDocumento,
+        numDocumento: numeroDocumento,
+        fechaNacimiento,
+        telefonos: telefonos.filter(t => t.numero.trim() !== ''),
+        mails: mails.filter(m => m.email.trim() !== ''),
+        direcciones: [buildDireccion()],
+      };
+      const result = await createPersonaFisica(personaData);
+      if (result) {
+        setSnackbar({ open: true, message: 'Inquilino creado exitosamente', severity: 'success' });
+        setTimeout(() => navigate('/inquilinos'), 1500);
+      } else {
+        setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
+      }
     } else {
-      setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
+      if (!razonSocial || !cuit) {
+        setSnackbar({ open: true, message: 'Por favor complete la razón social y el CUIT', severity: 'error' });
+        return;
+      }
+      const empresaData: PersonaJuridica = {
+        razonSocial,
+        nombreNegocio: nombreNegocio || undefined,
+        cuit,
+        fechaConstitucion,
+        telefonos: telefonos.filter(t => t.numero.trim() !== ''),
+        mails: mails.filter(m => m.email.trim() !== ''),
+        direcciones: [buildDireccion()],
+      };
+      const result = await createPersonaJuridica(empresaData);
+      if (result) {
+        setSnackbar({ open: true, message: 'Empresa creada exitosamente', severity: 'success' });
+        setTimeout(() => navigate('/inquilinos'), 1500);
+      } else {
+        setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
+      }
     }
   };
 
@@ -183,9 +222,9 @@ export default function NuevoInquilinoPage() {
                   <Person sx={{ mr: 1 }} />
                   Persona Física
                 </ToggleButton>
-                <ToggleButton value="empresa" aria-label="Empresa" disabled>
+                <ToggleButton value="empresa" aria-label="Empresa">
                   <Business sx={{ mr: 1 }} />
-                  Empresa (Próximamente)
+                  Empresa
                 </ToggleButton>
               </ToggleButtonGroup>
             </Box>
@@ -291,18 +330,60 @@ export default function NuevoInquilinoPage() {
             ) : (
               <>
                 <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
+                  <Business sx={{ verticalAlign: 'middle', mr: 1 }} />
                   Datos de la Empresa
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  El registro de empresas o personas jurídicas estará disponible próximamente.
-                </Typography>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Razón Social"
+                      value={razonSocial}
+                      onChange={(e) => setRazonSocial(e.target.value)}
+                      required
+                      inputProps={{ 'aria-required': 'true' }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Nombre comercial (opcional)"
+                      value={nombreNegocio}
+                      onChange={(e) => setNombreNegocio(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="CUIT"
+                      value={cuit}
+                      onChange={(e) => setCuit(e.target.value)}
+                      placeholder="XX-XXXXXXXX-X"
+                      required
+                      inputProps={{ 'aria-required': 'true' }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      label="Fecha de Constitución"
+                      value={fechaConstitucion}
+                      onChange={(e) => setFechaConstitucion(e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ 'aria-label': 'Fecha de constitución' }}
+                    />
+                  </Grid>
+                </Grid>
               </>
             )}
 
             <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, mt: 3, fontWeight: 600 }}>
               Información de Contacto
             </Typography>
-            
+
             <Box sx={{ mb: 4 }}>
               <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Teléfonos</Typography>
               {telefonos.map((tel, index) => (
@@ -457,7 +538,7 @@ export default function NuevoInquilinoPage() {
                 />
               </Grid>
             </Grid>
-            
+
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField

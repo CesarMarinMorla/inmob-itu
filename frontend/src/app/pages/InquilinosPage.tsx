@@ -19,14 +19,15 @@ import {
   Alert,
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
-import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica } from '../services/personasService';
+import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica, getPersonasJuridicas, deletePersonaJuridica, type PersonaJuridica } from '../services/personasService';
 
 export default function InquilinosPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [inquilinos, setInquilinos] = useState<PersonaFisica[]>([]);
+  const [inquilinos, setInquilinos] = useState<(PersonaFisica | PersonaJuridica)[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | number | null>(null);
+  const [deleteTipo, setDeleteTipo] = useState<'fisica' | 'juridica' | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -38,16 +39,24 @@ export default function InquilinosPage() {
   }, []);
 
   const loadInquilinos = async () => {
-    const data = await getPersonasFisicas();
-    setInquilinos(data);
+    const dataFisicas = await getPersonasFisicas();
+    const dataJuridicas = await getPersonasJuridicas();
+    setInquilinos([...dataFisicas, ...dataJuridicas]);
   };
 
   const filteredInquilinos = inquilinos.filter((inq) => {
     const searchLower = searchTerm.toLowerCase();
-    const nombre = `${inq.primerNombre} ${inq.primerApellido}`.toLowerCase();
-    const documento = inq.numDocumento;
-    const principalEmail = inq.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
     
+    // Type guard checks
+    const isFisica = 'primerNombre' in inq;
+    
+    const nombre = isFisica 
+      ? `${inq.primerNombre} ${inq.primerApellido}`.toLowerCase()
+      : `${inq.razonSocial}`.toLowerCase();
+      
+    const documento = isFisica ? inq.numDocumento : inq.cuit;
+    const principalEmail = inq.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
+
     return (
       nombre.includes(searchLower) ||
       documento?.includes(searchLower) ||
@@ -55,15 +64,25 @@ export default function InquilinosPage() {
     );
   });
 
-  const handleDelete = (id: string | number | undefined) => {
+  const handleDelete = (id: string | number | undefined, isPersonaFisica: boolean) => {
     if (!id) return;
     setSelectedId(id);
+    // Store type of entity being deleted in state or just rely on passing it. 
+    // For simplicity, we can encode it in selectedId if we want, or add a state.
+    // Let's add a state for the type being deleted.
+    setDeleteTipo(isPersonaFisica ? 'fisica' : 'juridica');
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!selectedId) return;
-    const success = await deletePersonaFisica(selectedId.toString());
+    if (!selectedId || !deleteTipo) return;
+    
+    let success = false;
+    if (deleteTipo === 'fisica') {
+        success = await deletePersonaFisica(selectedId.toString());
+    } else {
+        success = await deletePersonaJuridica(selectedId.toString());
+    }
     if (success) {
       setSnackbar({ open: true, message: 'Inquilino eliminado exitosamente', severity: 'success' });
       loadInquilinos();
@@ -72,25 +91,34 @@ export default function InquilinosPage() {
     }
     setDeleteDialogOpen(false);
     setSelectedId(null);
+    setDeleteTipo(null);
   };
 
-  const getNombreCompleto = (inq: PersonaFisica): string => {
-    return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
+  const getNombreCompleto = (inq: PersonaFisica | PersonaJuridica): string => {
+    if ('primerNombre' in inq) {
+        return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
+    } else {
+        return inq.razonSocial || '';
+    }
   };
 
-  const getDocumento = (inq: PersonaFisica): string => {
-    return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
+  const getDocumento = (inq: PersonaFisica | PersonaJuridica): string => {
+    if ('numDocumento' in inq) {
+        return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
+    } else {
+        return `CUIT ${inq.cuit || ''}`;
+    }
   };
 
-  const getPrincipalEmail = (inq: PersonaFisica): string => {
+  const getPrincipalEmail = (inq: PersonaFisica | PersonaJuridica): string => {
     return inq.mails?.find(m => m.esPrincipal)?.email || 'Sin email';
   };
 
-  const getPrincipalTelefono = (inq: PersonaFisica): string => {
+  const getPrincipalTelefono = (inq: PersonaFisica | PersonaJuridica): string => {
     return inq.telefonos?.[0]?.numero || 'Sin teléfono';
   };
 
-  const getDireccionPrincipal = (inq: PersonaFisica): string => {
+  const getDireccionPrincipal = (inq: PersonaFisica | PersonaJuridica): string => {
     const dir = inq.direcciones?.[0];
     if (!dir) return 'Sin dirección';
     return `${dir.calle || ''} ${dir.altura || ''}, ${dir.localidad || ''}`.trim();
@@ -179,7 +207,7 @@ export default function InquilinosPage() {
                   </Typography>
                   <Box sx={{ mt: 1 }}>
                     <Chip
-                      label="Persona Física"
+                      label={'primerNombre' in inq ? "Persona Física" : "Empresa"}
                       size="small"
                       color="default"
                     />
@@ -212,7 +240,7 @@ export default function InquilinosPage() {
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => navigate(`/inquilinos/${inq.numDocumento}/editar`)}
+                  onClick={() => navigate(`/inquilinos/${'numDocumento' in inq ? inq.numDocumento : inq.cuit}/editar`)}
                   startIcon={<Edit />}
                   aria-label={`Editar ${getNombreCompleto(inq)}`}
                 >
@@ -220,7 +248,7 @@ export default function InquilinosPage() {
                 </Button>
                 <IconButton
                   color="error"
-                  onClick={() => handleDelete(inq.id)}
+                  onClick={() => handleDelete(inq.id, 'primerNombre' in inq)}
                   aria-label={`Eliminar ${getNombreCompleto(inq)}`}
                 >
                   <Delete />

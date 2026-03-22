@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
-import { Box, Typography, Card, CardActionArea, CardContent } from '@mui/material';
-import { People, Home } from '@mui/icons-material';
+import { Box, Typography, Card, CardActionArea, CardContent, Icon } from '@mui/material';
+// Icons not needed anymore if we use Material Symbols Outlined through Icon component
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ export default function HomePage() {
                 textAlign: 'center',
               }}
             >
-              <People sx={{ fontSize: 100, color: 'text.primary' }} />
+              <Icon baseClassName="material-symbols-outlined" sx={{ fontSize: 100, color: 'text.primary' }}>location_away</Icon>
               <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
                 Ver Propietarios
               </Typography>
@@ -81,15 +81,13 @@ export default function HomePage() {
             height: 280,
             border: '1px solid',
             borderColor: 'divider',
+            opacity: 0.5,
             boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
             transition: 'all 0.2s',
-            '&:hover': {
-              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15)',
-              transform: 'translateY(-4px)',
-            },
           }}
         >
           <CardActionArea
+            disabled
             onClick={() => navigate('/inquilinos')}
             sx={{
               height: '100%',
@@ -98,7 +96,7 @@ export default function HomePage() {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            aria-label="Ver Inquilinos"
+            aria-label="Ver Inquilinos (Próximamente)"
           >
             <CardContent
               sx={{
@@ -109,8 +107,8 @@ export default function HomePage() {
                 textAlign: 'center',
               }}
             >
-              <People sx={{ fontSize: 100, color: 'text.primary' }} />
-              <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
+              <Icon baseClassName="material-symbols-outlined" sx={{ fontSize: 100, color: 'text.disabled' }}>vpn_key</Icon>
+              <Typography variant="h5" component="h3" sx={{ fontWeight: 500, color: 'text.disabled' }}>
                 Ver Inquilinos
               </Typography>
             </CardContent>
@@ -151,7 +149,7 @@ export default function HomePage() {
                 textAlign: 'center',
               }}
             >
-              <Home sx={{ fontSize: 100, color: 'text.primary' }} />
+              <Icon baseClassName="material-symbols-outlined" sx={{ fontSize: 100, color: 'text.primary' }}>holiday_village</Icon>
               <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
                 Ver Inmuebles
               </Typography>

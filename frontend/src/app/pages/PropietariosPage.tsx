@@ -21,13 +21,15 @@ import {
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
 import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica } from '../services/personasService';
+import { getPersonasJuridicas, deletePersonaJuridica, type PersonaJuridica } from '../services/personasService';
 
 export default function PropietariosPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [propietarios, setPropietarios] = useState<PersonaFisica[]>([]);
+  const [propietarios, setPropietarios] = useState<(PersonaFisica | PersonaJuridica)[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | number | null>(null);
+  const [deleteTipo, setDeleteTipo] = useState<'fisica' | 'juridica' | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -40,15 +42,23 @@ export default function PropietariosPage() {
 
   const loadPropietarios = async () => {
     const data = await getPersonasFisicas();
-    setPropietarios(data);
+    const data2 = await getPersonasJuridicas();
+    setPropietarios([...data, ...data2]);
   };
 
   const filteredPropietarios = propietarios.filter((prop) => {
     const searchLower = searchTerm.toLowerCase();
-    const nombre = `${prop.primerNombre} ${prop.primerApellido}`.toLowerCase();
-    const documento = prop.numDocumento;
-    const principalEmail = prop.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
     
+    // Type guard checks
+    const isFisica = 'primerNombre' in prop;
+    
+    const nombre = isFisica 
+      ? `${prop.primerNombre} ${prop.primerApellido}`.toLowerCase()
+      : `${prop.razonSocial}`.toLowerCase();
+      
+    const documento = isFisica ? prop.numDocumento : prop.cuit;
+    const principalEmail = prop.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
+
     return (
       nombre.includes(searchLower) ||
       documento?.includes(searchLower) ||
@@ -56,15 +66,22 @@ export default function PropietariosPage() {
     );
   });
 
-  const handleDelete = (id: string | number | undefined) => {
+  const handleDelete = (id: string | number | undefined, isPersonaFisica: boolean) => {
     if (!id) return;
     setSelectedId(id);
+    setDeleteTipo(isPersonaFisica ? 'fisica' : 'juridica');
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!selectedId) return;
-    const success = await deletePersonaFisica(selectedId.toString());
+    if (!selectedId || !deleteTipo) return;
+    
+    let success = false;
+    if (deleteTipo === 'fisica') {
+        success = await deletePersonaFisica(selectedId.toString());
+    } else {
+        success = await deletePersonaJuridica(selectedId.toString());
+    }
     if (success) {
       setSnackbar({ open: true, message: 'Propietario eliminado exitosamente', severity: 'success' });
       loadPropietarios();
@@ -73,25 +90,34 @@ export default function PropietariosPage() {
     }
     setDeleteDialogOpen(false);
     setSelectedId(null);
+    setDeleteTipo(null);
   };
 
-  const getNombreCompleto = (prop: PersonaFisica): string => {
-    return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
+  const getNombreCompleto = (prop: PersonaFisica | PersonaJuridica): string => {
+    if ('primerNombre' in prop) {
+        return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
+    } else {
+        return prop.razonSocial || '';
+    }
   };
 
-  const getDocumento = (prop: PersonaFisica): string => {
-    return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+  const getDocumento = (prop: PersonaFisica | PersonaJuridica): string => {
+    if ('numDocumento' in prop) {
+        return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+    } else {
+        return `CUIT ${prop.cuit || ''}`;
+    }
   };
 
-  const getPrincipalEmail = (prop: PersonaFisica): string => {
+  const getPrincipalEmail = (prop: PersonaFisica | PersonaJuridica): string => {
     return prop.mails?.find(m => m.esPrincipal)?.email || 'Sin email';
   };
 
-  const getPrincipalTelefono = (prop: PersonaFisica): string => {
+  const getPrincipalTelefono = (prop: PersonaFisica | PersonaJuridica): string => {
     return prop.telefonos?.[0]?.numero || 'Sin teléfono';
   };
 
-  const getDireccionPrincipal = (prop: PersonaFisica): string => {
+  const getDireccionPrincipal = (prop: PersonaFisica | PersonaJuridica): string => {
     const dir = prop.direcciones?.[0];
     if (!dir) return 'Sin dirección';
     return `${dir.calle || ''} ${dir.altura || ''}, ${dir.localidad || ''}`.trim();
@@ -180,7 +206,7 @@ export default function PropietariosPage() {
                   </Typography>
                   <Box sx={{ mt: 1 }}>
                     <Chip
-                      label="Persona Física"
+                      label={'primerNombre' in prop ? "Persona Física" : "Empresa"}
                       size="small"
                       color="default"
                     />
@@ -213,7 +239,7 @@ export default function PropietariosPage() {
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => navigate(`/propietarios/${prop.numDocumento}/editar`)}
+                  onClick={() => navigate(`/propietarios/${'numDocumento' in prop ? prop.numDocumento : prop.cuit}/editar`)}
                   startIcon={<Edit />}
                   aria-label={`Editar ${getNombreCompleto(prop)}`}
                 >
@@ -221,7 +247,7 @@ export default function PropietariosPage() {
                 </Button>
                 <IconButton
                   color="error"
-                  onClick={() => handleDelete(prop.id)}
+                  onClick={() => handleDelete(prop.id, 'primerNombre' in prop)}
                   aria-label={`Eliminar ${getNombreCompleto(prop)}`}
                 >
                   <Delete />
