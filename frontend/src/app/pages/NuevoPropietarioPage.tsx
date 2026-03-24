@@ -66,7 +66,7 @@ export default function NuevoPropietarioPage() {
   const [provincia, setProvincia] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
-  const [tipoDomicilio, setTipoDomicilio] = useState<'PARTICULAR' | 'LABORAL' | 'OTRO'>('PARTICULAR');
+  const [tipoDomicilio, setTipoDomicilio] = useState<'REAL' | 'LEGAL' | 'CONSTITUIDO' | 'LABORAL' | 'SOCIAL' | 'FISCAL' | 'SUCURSAL'>('REAL');
 
   const provinciasArgentinas = [
     'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -214,7 +214,12 @@ export default function NuevoPropietarioPage() {
               <ToggleButtonGroup
                 value={tipo}
                 exclusive
-                onChange={(_, newTipo) => newTipo && setTipo(newTipo)}
+                onChange={(_, newTipo) => {
+                  if (newTipo) {
+                    setTipo(newTipo);
+                    setTipoDomicilio(newTipo === 'persona' ? 'REAL' : 'SOCIAL');
+                  }
+                }}
                 aria-label="Tipo de propietario"
                 fullWidth
               >
@@ -501,11 +506,18 @@ export default function NuevoPropietarioPage() {
                   fullWidth
                   label="Tipo de Domicilio"
                   value={tipoDomicilio}
-                  onChange={(e) => setTipoDomicilio(e.target.value as 'PARTICULAR' | 'LABORAL' | 'OTRO')}
+                  onChange={(e) => setTipoDomicilio(e.target.value as any)}
                 >
-                  <MenuItem value="PARTICULAR">Particular</MenuItem>
-                  <MenuItem value="LABORAL">Laboral</MenuItem>
-                  <MenuItem value="OTRO">Otro</MenuItem>
+                  {tipo === 'persona' ? [
+                    <MenuItem key="REAL" value="REAL">Real</MenuItem>,
+                    <MenuItem key="LEGAL" value="LEGAL">Legal</MenuItem>,
+                    <MenuItem key="CONSTITUIDO" value="CONSTITUIDO">Constituido</MenuItem>,
+                    <MenuItem key="LABORAL" value="LABORAL">Laboral</MenuItem>
+                  ] : [
+                    <MenuItem key="SOCIAL" value="SOCIAL">Social</MenuItem>,
+                    <MenuItem key="FISCAL" value="FISCAL">Fiscal</MenuItem>,
+                    <MenuItem key="SUCURSAL" value="SUCURSAL">Sucursal</MenuItem>
+                  ]}
                 </TextField>
               </Grid>
             </Grid>

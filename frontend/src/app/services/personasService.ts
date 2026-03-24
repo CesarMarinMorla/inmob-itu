@@ -18,7 +18,7 @@ export interface Direccion {
   localidad: string;
   provincia: string;
   codigoPostal?: string;
-  tipoDomicilio: 'PARTICULAR' | 'LABORAL' | 'OTRO';
+  tipoDomicilio: 'REAL' | 'LEGAL' | 'CONSTITUIDO' | 'LABORAL' | 'SOCIAL' | 'FISCAL' | 'SUCURSAL';
 }
 
 export interface PersonaFisica {
