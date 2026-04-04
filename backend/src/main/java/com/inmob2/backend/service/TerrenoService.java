@@ -26,6 +26,24 @@ public class TerrenoService {
     }
 
     @Transactional
+    public void eliminar(Long id) {
+        if (!terrenoRepository.existsById(id))
+            throw new jakarta.persistence.EntityNotFoundException("Terreno no encontrado con id: " + id);
+        terrenoRepository.deleteById(id);
+    }
+
+    @Transactional
+    public TerrenoDTO actualizar(Long id, TerrenoDTO dto) {
+        Terreno entidad = terrenoRepository.findById(id)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Terreno no encontrado con id: " + id));
+        propiedadMapper.mapearCamposBasePropiedadHaciaEntidad(dto, entidad);
+        entidad.setAplicaRendimiento(dto.getAplicaRendimiento());
+        entidad.setSuperficieProduccion(dto.getSuperficieProduccion());
+        entidad.setPerimetro(dto.getPerimetro());
+        return mapToDto(terrenoRepository.save(entidad));
+    }
+
+    @Transactional
     public TerrenoDTO guardar(TerrenoDTO dto) {
         Terreno terreno = mapToEntity(dto);
         Terreno terrenoGuardado = terrenoRepository.save(terreno);

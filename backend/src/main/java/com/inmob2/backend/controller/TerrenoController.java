@@ -27,4 +27,15 @@ public class TerrenoController {
         TerrenoDTO guardado = terrenoService.guardar(dto);
         return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TerrenoDTO> actualizarTerreno(@PathVariable Long id, @Valid @RequestBody TerrenoDTO dto) {
+        return ResponseEntity.ok(terrenoService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarTerreno(@PathVariable Long id) {
+        terrenoService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }
