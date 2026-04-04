@@ -27,4 +27,15 @@ public class CasaController {
         CasaDTO guardado = casaService.guardar(dto);
         return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CasaDTO> actualizarCasa(@PathVariable Long id, @Valid @RequestBody CasaDTO dto) {
+        return ResponseEntity.ok(casaService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarCasa(@PathVariable Long id) {
+        casaService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

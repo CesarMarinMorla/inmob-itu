@@ -27,4 +27,15 @@ public class DepartamentoController {
         DepartamentoDTO guardado = departamentoService.guardar(dto);
         return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartamentoDTO> actualizarDepartamento(@PathVariable Long id, @Valid @RequestBody DepartamentoDTO dto) {
+        return ResponseEntity.ok(departamentoService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarDepartamento(@PathVariable Long id) {
+        departamentoService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }
