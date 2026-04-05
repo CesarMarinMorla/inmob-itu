@@ -38,6 +38,13 @@ public class PersonaFisicaService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la persona con DNI: " + dni));
     }
 
+    @Transactional(readOnly = true)
+    public PersonaFisicaDTO obtenerPorId(Long id) {
+        return personaFisicaRepository.findById(id)
+                .map(this::convertirADto)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la persona con ID: " + id));
+    }
+
     @Transactional
     public PersonaFisicaDTO actualizar(Long id, PersonaFisicaDTO dto) {
         PersonaFisica entidad = personaFisicaRepository.findById(id)

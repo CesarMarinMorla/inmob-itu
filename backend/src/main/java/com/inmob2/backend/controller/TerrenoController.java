@@ -22,6 +22,11 @@ public class TerrenoController {
         return ResponseEntity.ok(terrenoService.obtenerTodos());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<TerrenoDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(terrenoService.obtenerPorId(id));
+    }
+
     @PostMapping
     public ResponseEntity<TerrenoDTO> crearTerreno(@Valid @RequestBody TerrenoDTO dto) {
         TerrenoDTO guardado = terrenoService.guardar(dto);

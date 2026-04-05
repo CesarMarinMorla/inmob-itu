@@ -22,6 +22,11 @@ public class CasaController {
         return ResponseEntity.ok(casaService.obtenerTodas());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CasaDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(casaService.obtenerPorId(id));
+    }
+
     @PostMapping
     public ResponseEntity<CasaDTO> crearCasa(@Valid @RequestBody CasaDTO dto) {
         CasaDTO guardado = casaService.guardar(dto);

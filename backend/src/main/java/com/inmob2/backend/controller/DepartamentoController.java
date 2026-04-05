@@ -22,6 +22,11 @@ public class DepartamentoController {
         return ResponseEntity.ok(departamentoService.obtenerTodos());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartamentoDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(departamentoService.obtenerPorId(id));
+    }
+
     @PostMapping
     public ResponseEntity<DepartamentoDTO> crearDepartamento(@Valid @RequestBody DepartamentoDTO dto) {
         DepartamentoDTO guardado = departamentoService.guardar(dto);

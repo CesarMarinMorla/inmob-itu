@@ -25,6 +25,13 @@ public class CasaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public CasaDTO obtenerPorId(Long id) {
+        return casaRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Casa no encontrada con id: " + id));
+    }
+
     @Transactional
     public void eliminar(Long id) {
         if (!casaRepository.existsById(id))

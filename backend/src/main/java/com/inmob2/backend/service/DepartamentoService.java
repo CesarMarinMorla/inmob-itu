@@ -25,6 +25,13 @@ public class DepartamentoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public DepartamentoDTO obtenerPorId(Long id) {
+        return departamentoRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Departamento no encontrado con id: " + id));
+    }
+
     @Transactional
     public void eliminar(Long id) {
         if (!departamentoRepository.existsById(id))

@@ -38,6 +38,13 @@ public class PersonaJuridicaService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la empresa con CUIT: " + cuit));
     }
 
+    @Transactional(readOnly = true)
+    public PersonaJuridicaDTO obtenerPorId(Long id) {
+        return personaJuridicaRepository.findById(id)
+                .map(this::convertirADto)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la empresa con ID: " + id));
+    }
+
     @Transactional
     public PersonaJuridicaDTO actualizar(Long id, PersonaJuridicaDTO dto) {
         PersonaJuridica entidad = personaJuridicaRepository.findById(id)

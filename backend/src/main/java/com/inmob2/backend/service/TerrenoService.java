@@ -25,6 +25,13 @@ public class TerrenoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public TerrenoDTO obtenerPorId(Long id) {
+        return terrenoRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Terreno no encontrado con id: " + id));
+    }
+
     @Transactional
     public void eliminar(Long id) {
         if (!terrenoRepository.existsById(id))
