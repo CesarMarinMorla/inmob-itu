@@ -52,9 +52,8 @@ public abstract class Propiedad {
     )
     private List<Propietario> dueniosLista = new ArrayList<>();
 
-    // TODO: Implementar cuando se desarrolle el módulo de Contratos
-    // @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Contrato> historialContratos = new ArrayList<>();
+    @OneToMany(mappedBy = "propiedadAlquilada", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<com.inmob2.backend.model.entity.contrato.Contrato> historialContratos = new ArrayList<>();
 
     // --- Helper Methods ---
     public void setDireccion(DireccionPropiedad direccion) {

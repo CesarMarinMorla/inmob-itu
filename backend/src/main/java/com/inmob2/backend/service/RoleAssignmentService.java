@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,6 +99,157 @@ public class RoleAssignmentService {
         return mapToAdministradorDto(administradorRepository.save(admin));
     }
 
+    // --- Consulta ---
+
+    @Transactional(readOnly = true)
+    public List<RolDTO> obtenerRolesDePersona(Long personaId) {
+        Persona persona = buscarPersona(personaId);
+        return persona.getRoles().stream()
+                .map(this::mapRolToDto)
+                .collect(Collectors.toList());
+    }
+
+    private RolDTO mapRolToDto(Rol rol) {
+        if (rol instanceof Propietario) return mapToPropietarioDto((Propietario) rol);
+        if (rol instanceof Inquilino) return mapToInquilinoDto((Inquilino) rol);
+        if (rol instanceof Garante) return mapToGaranteDto((Garante) rol);
+        if (rol instanceof Empleado) return mapToEmpleadoDto((Empleado) rol);
+        if (rol instanceof Administrador) return mapToAdministradorDto((Administrador) rol);
+        throw new IllegalStateException("Tipo de rol desconocido: " + rol.getClass().getSimpleName());
+    }
+
+    // --- Actualización ---
+
+    @Transactional
+    public PropietarioDTO actualizarRolPropietario(Long personaId, Long rolId, PropietarioDTO dto) {
+        Propietario propietario = propietarioRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Propietario con ID: " + rolId));
+        validarRolPertenece(propietario, personaId);
+
+        propietario.setObservacionesPrivadas(dto.getObservacionesPrivadas());
+        propietario.setCuitCuil(dto.getCuitCuil());
+        propietario.setCondicionIva(dto.getCondicionIva());
+        propietario.setIngresosBrutosNro(dto.getIngresosBrutosNro());
+        propietario.setEsPersonaJuridica(dto.getEsPersonaJuridica());
+        propietario.setObservacionesPropietario(dto.getObservacionesPropietario());
+
+        return mapToPropietarioDto(propietarioRepository.save(propietario));
+    }
+
+    @Transactional
+    public InquilinoDTO actualizarRolInquilino(Long personaId, Long rolId, InquilinoDTO dto) {
+        Inquilino inquilino = inquilinoRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Inquilino con ID: " + rolId));
+        validarRolPertenece(inquilino, personaId);
+
+        inquilino.setObservacionesPrivadas(dto.getObservacionesPrivadas());
+        inquilino.setOcupacionPrincipal(dto.getOcupacionPrincipal());
+        inquilino.setIngresosMensuales(dto.getIngresosMensuales());
+        inquilino.setAntiguedadLaboral(dto.getAntiguedadLaboral());
+        inquilino.setAntecedentesMora(dto.getAntecedentesMora());
+
+        return mapToInquilinoDto(inquilinoRepository.save(inquilino));
+    }
+
+    @Transactional
+    public GaranteDTO actualizarRolGarante(Long personaId, Long rolId, GaranteDTO dto) {
+        Garante garante = garanteRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Garante con ID: " + rolId));
+        validarRolPertenece(garante, personaId);
+
+        garante.setObservacionesPrivadas(dto.getObservacionesPrivadas());
+        garante.setIngresosMensualesComprobables(dto.getIngresosMensualesComprobables());
+        garante.setPoseeInmuebles(dto.getPoseeInmuebles());
+        garante.setSituacionLaboral(dto.getSituacionLaboral());
+        garante.setObservacionesGarante(dto.getObservacionesGarante());
+
+        return mapToGaranteDto(garanteRepository.save(garante));
+    }
+
+    @Transactional
+    public EmpleadoDTO actualizarRolEmpleado(Long personaId, Long rolId, EmpleadoDTO dto) {
+        Empleado empleado = empleadoRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Empleado con ID: " + rolId));
+        validarRolPertenece(empleado, personaId);
+
+        empleado.setLegajo(dto.getLegajo());
+        empleado.setNombreUsuario(dto.getNombreUsuario());
+        empleado.setPasswordHash(dto.getPasswordHash()); // TODO: Hashear en producción
+        empleado.setFechaIngreso(dto.getFechaIngreso());
+        empleado.setNivelAcceso(dto.getNivelAcceso());
+        empleado.setPuesto(dto.getPuesto());
+
+        return mapToEmpleadoDto(empleadoRepository.save(empleado));
+    }
+
+    @Transactional
+    public AdministradorDTO actualizarRolAdministrador(Long personaId, Long rolId, AdministradorDTO dto) {
+        Administrador admin = administradorRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Administrador con ID: " + rolId));
+        validarRolPertenece(admin, personaId);
+
+        admin.setLegajo(dto.getLegajo());
+        admin.setNombreUsuario(dto.getNombreUsuario());
+        admin.setPasswordHash(dto.getPasswordHash()); // TODO: Hashear en producción
+        admin.setFechaIngreso(dto.getFechaIngreso());
+        admin.setNivelAcceso(dto.getNivelAcceso());
+        admin.setAreaSupervision(dto.getAreaSupervision());
+
+        return mapToAdministradorDto(administradorRepository.save(admin));
+    }
+
+    // --- Eliminación ---
+
+    @Transactional
+    public void eliminarRolPropietario(Long personaId, Long rolId) {
+        Propietario propietario = propietarioRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Propietario con ID: " + rolId));
+        validarRolPertenece(propietario, personaId);
+
+        propietario.getPersona().removeRol(propietario);
+        propietarioRepository.delete(propietario);
+    }
+
+    @Transactional
+    public void eliminarRolInquilino(Long personaId, Long rolId) {
+        Inquilino inquilino = inquilinoRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Inquilino con ID: " + rolId));
+        validarRolPertenece(inquilino, personaId);
+
+        inquilino.getPersona().removeRol(inquilino);
+        inquilinoRepository.delete(inquilino);
+    }
+
+    @Transactional
+    public void eliminarRolGarante(Long personaId, Long rolId) {
+        Garante garante = garanteRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Garante con ID: " + rolId));
+        validarRolPertenece(garante, personaId);
+
+        garante.getPersona().removeRol(garante);
+        garanteRepository.delete(garante);
+    }
+
+    @Transactional
+    public void eliminarRolEmpleado(Long personaId, Long rolId) {
+        Empleado empleado = empleadoRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Empleado con ID: " + rolId));
+        validarRolPertenece(empleado, personaId);
+
+        empleado.getPersona().removeRol(empleado);
+        empleadoRepository.delete(empleado);
+    }
+
+    @Transactional
+    public void eliminarRolAdministrador(Long personaId, Long rolId) {
+        Administrador admin = administradorRepository.findById(rolId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el rol Administrador con ID: " + rolId));
+        validarRolPertenece(admin, personaId);
+
+        admin.getPersona().removeRol(admin);
+        administradorRepository.delete(admin);
+    }
+
     // --- Helpers ---
 
     private Persona buscarPersona(Long personaId) {
@@ -107,6 +260,12 @@ public class RoleAssignmentService {
     private void validarRolUnico(Persona persona, Class<? extends Rol> claseRol) {
         if (persona.getRoles().stream().anyMatch(claseRol::isInstance)) {
             throw new IllegalStateException("La persona ya tiene asignado el rol: " + claseRol.getSimpleName());
+        }
+    }
+
+    private void validarRolPertenece(Rol rol, Long personaId) {
+        if (!rol.getPersona().getId().equals(personaId)) {
+            throw new IllegalArgumentException("El rol con ID " + rol.getId() + " no pertenece a la persona con ID: " + personaId);
         }
     }
 

@@ -27,6 +27,11 @@ public class PersonaFisicaController {
         return ResponseEntity.ok(personaFisicaService.obtenerPorDni(dni));
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<PersonaFisicaDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(personaFisicaService.obtenerPorId(id));
+    }
+
     @PostMapping
     public ResponseEntity<PersonaFisicaDTO> crearPersona(@Valid @RequestBody PersonaFisicaDTO dto) {
         PersonaFisicaDTO personaGuardada = personaFisicaService.guardar(dto);
