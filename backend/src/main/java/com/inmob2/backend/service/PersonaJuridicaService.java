@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +22,27 @@ public class PersonaJuridicaService {
     @Transactional(readOnly = true)
     public List<PersonaJuridicaDTO> obtenerTodas() {
         return personaJuridicaRepository.findAll().stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PersonaJuridicaDTO> obtenerPorRol(String rol) {
+        Map<String, Supplier<List<PersonaJuridica>>> queries = Map.of(
+                "inquilino", personaJuridicaRepository::findAllWithRolInquilino,
+                "propietario", personaJuridicaRepository::findAllWithRolPropietario,
+                "garante", personaJuridicaRepository::findAllWithRolGarante,
+                "empleado", personaJuridicaRepository::findAllWithRolEmpleado,
+                "administrador", personaJuridicaRepository::findAllWithRolAdministrador
+        );
+
+        Supplier<List<PersonaJuridica>> query = queries.get(rol.toLowerCase());
+        if (query == null) {
+            throw new IllegalArgumentException(
+                "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
+        }
+
+        return query.get().stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
