@@ -48,14 +48,14 @@ export default function PropietariosPage() {
 
   const filteredPropietarios = propietarios.filter((prop) => {
     const searchLower = searchTerm.toLowerCase();
-    
+
     // Type guard checks
     const isFisica = 'primerNombre' in prop;
-    
-    const nombre = isFisica 
+
+    const nombre = isFisica
       ? `${prop.primerNombre} ${prop.primerApellido}`.toLowerCase()
       : `${prop.razonSocial}`.toLowerCase();
-      
+
     const documento = isFisica ? prop.numDocumento : prop.cuit;
     const principalEmail = prop.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
 
@@ -75,12 +75,12 @@ export default function PropietariosPage() {
 
   const confirmDelete = async () => {
     if (!selectedId || !deleteTipo) return;
-    
+
     let success = false;
     if (deleteTipo === 'fisica') {
-        success = await deletePersonaFisica(selectedId.toString());
+      success = await deletePersonaFisica(selectedId.toString());
     } else {
-        success = await deletePersonaJuridica(selectedId.toString());
+      success = await deletePersonaJuridica(selectedId.toString());
     }
     if (success) {
       setSnackbar({ open: true, message: 'Propietario eliminado exitosamente', severity: 'success' });
@@ -95,17 +95,17 @@ export default function PropietariosPage() {
 
   const getNombreCompleto = (prop: PersonaFisica | PersonaJuridica): string => {
     if ('primerNombre' in prop) {
-        return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
+      return `${prop.primerNombre || ''} ${prop.segundoNombre || ''} ${prop.primerApellido || ''} ${prop.segundoApellido || ''}`.trim();
     } else {
-        return prop.razonSocial || '';
+      return prop.razonSocial || '';
     }
   };
 
   const getDocumento = (prop: PersonaFisica | PersonaJuridica): string => {
     if ('numDocumento' in prop) {
-        return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+      return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
     } else {
-        return `CUIT ${prop.cuit || ''}`;
+      return `CUIT ${prop.cuit || ''}`;
     }
   };
 
