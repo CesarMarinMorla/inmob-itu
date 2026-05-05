@@ -50,9 +50,10 @@ const API_BASE_URL = 'http://localhost:8080/api/v1';
 const API_PERSONAS_FISICAS_URL = `${API_BASE_URL}/personas-fisicas`;
 const API_PERSONAS_JURIDICAS_URL = `${API_BASE_URL}/personas-juridicas`;
 
-export const getPersonasFisicas = async (): Promise<PersonaFisica[]> => {
+export const getPersonasFisicas = async (rol?: string): Promise<PersonaFisica[]> => {
   try {
-    const response = await fetch(API_PERSONAS_FISICAS_URL);
+    const url = rol ? `${API_PERSONAS_FISICAS_URL}?rol=${rol}` : API_PERSONAS_FISICAS_URL;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
