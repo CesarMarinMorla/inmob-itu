@@ -7,7 +7,7 @@ export interface Propietario {
   segundoNombre?: string;
   primerApellido?: string;
   segundoApellido?: string;
-  tipoDocumento?: 'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte';
+  tipoDocumento?: 'dni' | 'cuit' | 'cuit' | 'pasaporte';
   numeroDocumento?: string;
   fechaNacimiento?: string;
   // Empresa
@@ -32,7 +32,7 @@ export interface Inquilino {
   segundoNombre?: string;
   primerApellido?: string;
   segundoApellido?: string;
-  tipoDocumento?: 'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte';
+  tipoDocumento?: 'dni' | 'cuit' | 'cuil' | 'pasaporte';
   numeroDocumento?: string;
   fechaNacimiento?: string;
   // Empresa
@@ -55,8 +55,8 @@ export interface Inmueble {
   provincia: string;
   localidad: string;
   codigoPostal?: string;
-  tipo: 'Casa' | 'Departamento' | 'Local' | 'Terreno' | 'Oficina';
-  estado: 'Disponible' | 'Alquilado' | 'Reservado';
+  tipo: 'casa' | 'departamento' | 'local' | 'terreno' | 'oficina';
+  estado: 'disponible' | 'alquilado' | 'reservado' | 'fuera_de_servicio';
   precio: number;
   propietarioId?: string;
   inquilinoId?: string;
@@ -84,7 +84,7 @@ export let propietarios: Propietario[] = [
     tipo: 'persona',
     primerNombre: 'Juan',
     primerApellido: 'Pérez',
-    tipoDocumento: 'DNI',
+    tipoDocumento: 'dni',
     numeroDocumento: '13532521',
     email: 'juanperez@gmail.com',
     telefono: '+54 9 2253 545 234',
@@ -103,7 +103,7 @@ export let inquilinos: Inquilino[] = [
     tipo: 'persona',
     primerNombre: 'María',
     primerApellido: 'González',
-    tipoDocumento: 'DNI',
+    tipoDocumento: 'dni',
     numeroDocumento: '25123456',
     email: 'maria.gonzalez@gmail.com',
     telefono: '+54 9 2253 123 456',
@@ -123,8 +123,8 @@ export let inmuebles: Inmueble[] = [
     provincia: 'Chubut',
     localidad: 'Esquel',
     codigoPostal: '9200',
-    tipo: 'Casa',
-    estado: 'Disponible',
+    tipo: 'casa',
+    estado: 'disponible',
     precio: 500000,
     descripcion: 'Casa amplia con jardín',
   },
@@ -156,13 +156,13 @@ export const updatePropietario = (id: string, data: Partial<Propietario>): Propi
 export const deletePropietario = (id: string): boolean => {
   const index = propietarios.findIndex(p => p.id === id);
   if (index === -1) return false;
-  
+
   // Desvincular de inquilinos
   const propietario = propietarios[index];
   propietario.inquilinos.forEach(inquilinoId => {
     unlinkPropietarioFromInquilino(id, inquilinoId);
   });
-  
+
   propietarios.splice(index, 1);
   return true;
 };
@@ -193,13 +193,13 @@ export const updateInquilino = (id: string, data: Partial<Inquilino>): Inquilino
 export const deleteInquilino = (id: string): boolean => {
   const index = inquilinos.findIndex(i => i.id === id);
   if (index === -1) return false;
-  
+
   // Desvincular de propietarios
   const inquilino = inquilinos[index];
   inquilino.propietarios.forEach(propietarioId => {
     unlinkInquilinoFromPropietario(id, propietarioId);
   });
-  
+
   inquilinos.splice(index, 1);
   return true;
 };
@@ -238,7 +238,7 @@ export const deleteInmueble = (id: string): boolean => {
 export const linkPropietarioToInquilino = (propietarioId: string, inquilinoId: string): void => {
   const propietario = getPropietarioById(propietarioId);
   const inquilino = getInquilinoById(inquilinoId);
-  
+
   if (propietario && inquilino) {
     if (!propietario.inquilinos.includes(inquilinoId)) {
       propietario.inquilinos.push(inquilinoId);
@@ -252,7 +252,7 @@ export const linkPropietarioToInquilino = (propietarioId: string, inquilinoId: s
 export const unlinkPropietarioFromInquilino = (propietarioId: string, inquilinoId: string): void => {
   const propietario = getPropietarioById(propietarioId);
   const inquilino = getInquilinoById(inquilinoId);
-  
+
   if (propietario) {
     propietario.inquilinos = propietario.inquilinos.filter(id => id !== inquilinoId);
   }
