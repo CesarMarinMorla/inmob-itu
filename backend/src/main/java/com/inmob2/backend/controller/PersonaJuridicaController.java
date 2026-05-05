@@ -18,8 +18,12 @@ public class PersonaJuridicaController {
     private final PersonaJuridicaService personaJuridicaService;
 
     @GetMapping
-    public ResponseEntity<List<PersonaJuridicaDTO>> listarTodas() {
-        return ResponseEntity.ok(personaJuridicaService.obtenerTodas());
+    public ResponseEntity<List<PersonaJuridicaDTO>> listarTodas(
+            @RequestParam(required = false) String rol) {
+        List<PersonaJuridicaDTO> resultado = (rol != null && !rol.isBlank())
+                ? personaJuridicaService.obtenerPorRol(rol)
+                : personaJuridicaService.obtenerTodas();
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/cuit/{cuit}")

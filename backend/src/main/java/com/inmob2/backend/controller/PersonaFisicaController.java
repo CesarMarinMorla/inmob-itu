@@ -18,8 +18,12 @@ public class PersonaFisicaController {
     private final PersonaFisicaService personaFisicaService;
 
     @GetMapping
-    public ResponseEntity<List<PersonaFisicaDTO>> listarTodas() {
-        return ResponseEntity.ok(personaFisicaService.obtenerTodas());
+    public ResponseEntity<List<PersonaFisicaDTO>> listarTodas(
+            @RequestParam(required = false) String rol) {
+        List<PersonaFisicaDTO> resultado = (rol != null && !rol.isBlank())
+                ? personaFisicaService.obtenerPorRol(rol)
+                : personaFisicaService.obtenerTodas();
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/{dni}")
