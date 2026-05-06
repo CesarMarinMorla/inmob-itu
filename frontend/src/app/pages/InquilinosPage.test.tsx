@@ -25,11 +25,11 @@ const mockFisica: personasService.PersonaFisica = {
   id: 1,
   primerNombre: 'Carlos',
   primerApellido: 'Gomez',
-  tipoDocumento: 'DNI',
+  tipoDocumento: 'dni',
   numDocumento: '11111111',
   fechaNacimiento: '1990-01-01',
-  telefonos: [{ numero: '1234567890', tipo: 'CELULAR' }],
-  mails: [{ email: 'carlos@test.com', tipo: 'PERSONAL', esPrincipal: true }],
+  telefonos: [{ numero: '1234567890', tipo: 'celular' }],
+  mails: [{ email: 'carlos@test.com', tipo: 'personal', esPrincipal: true }],
   direcciones: []
 };
 
@@ -39,7 +39,7 @@ const mockJuridica: personasService.PersonaJuridica = {
   cuit: '30-11111111-9',
   fechaConstitucion: '2000-01-01',
   telefonos: [],
-  mails: [{ email: 'empresa@test.com', tipo: 'LABORAL', esPrincipal: true }],
+  mails: [{ email: 'empresa@test.com', tipo: 'laboral', esPrincipal: true }],
   direcciones: []
 };
 
@@ -52,7 +52,7 @@ describe('InquilinosPage Component', () => {
 
   const renderComponent = () => render(
     <MemoryRouter>
-        <InquilinosPage />
+      <InquilinosPage />
     </MemoryRouter>
   );
 
@@ -92,10 +92,10 @@ describe('InquilinosPage Component', () => {
     expect(await screen.findByText('Carlos Gomez')).toBeInTheDocument();
 
     const searchInput = screen.getByRole('textbox', { name: /buscar inquilinos/i });
-    
+
     // Filter for "Empresa"
     fireEvent.change(searchInput, { target: { value: 'Empresa' } });
-    
+
     expect(screen.getByText('Empresa Test')).toBeInTheDocument();
     expect(screen.queryByText('Carlos Gomez')).not.toBeInTheDocument();
   });
@@ -105,7 +105,7 @@ describe('InquilinosPage Component', () => {
     (personasService.deletePersonaFisica as any).mockResolvedValue(true);
 
     renderComponent();
-    
+
     // Wait for data
     expect(await screen.findByText('Carlos Gomez')).toBeInTheDocument();
 
@@ -115,15 +115,15 @@ describe('InquilinosPage Component', () => {
 
     // Dialog should appear
     expect(screen.getByRole('dialog', { name: /confirmar eliminación/i })).toBeInTheDocument();
-    
+
     // Confirm delete
     const confirmBtn = screen.getByRole('button', { name: 'Eliminar' });
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-        expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
+      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
     });
-    
+
     // Check if success snackbar pops up
     expect(screen.getByText(/inquilino eliminado exitosamente/i)).toBeInTheDocument();
   });

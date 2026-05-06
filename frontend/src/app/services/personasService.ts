@@ -1,11 +1,11 @@
 export interface Telefono {
   numero: string;
-  tipo: 'CELULAR' | 'FIJO';
+  tipo: 'celular' | 'fijo' | 'trabajo';
 }
 
 export interface Mail {
   email: string;
-  tipo: 'PERSONAL' | 'LABORAL';
+  tipo: 'personal' | 'laboral';
   esPrincipal: boolean;
 }
 
@@ -18,7 +18,7 @@ export interface Direccion {
   localidad: string;
   provincia: string;
   codigoPostal?: string;
-  tipoDomicilio: 'PARTICULAR' | 'LABORAL' | 'OTRO';
+  tipoDomicilio: 'legal' | 'particular' | 'comercial';
 }
 
 export interface PersonaFisica {
@@ -27,7 +27,7 @@ export interface PersonaFisica {
   segundoNombre?: string;
   primerApellido: string;
   segundoApellido?: string;
-  tipoDocumento: 'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte';
+  tipoDocumento: 'dni' | 'cuit' | 'cuil' | 'pasaporte';
   numDocumento: string;
   fechaNacimiento: string;
   telefonos: Telefono[];
@@ -49,6 +49,24 @@ export interface PersonaJuridica {
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 const API_PERSONAS_FISICAS_URL = `${API_BASE_URL}/personas-fisicas`;
 const API_PERSONAS_JURIDICAS_URL = `${API_BASE_URL}/personas-juridicas`;
+
+// Tipos para roles
+export interface InquilinoDTO {
+  ocupacionPrincipal?: string;
+  ingresosMensuales?: number;
+  antiguedadLaboral?: number;
+  antecedentesMora?: boolean;
+  observacionesPrivadas?: string;
+}
+
+export interface PropietarioDTO {
+  cuitCuil?: string;
+  condicionIva?: string;
+  ingresosBrutosNro?: string;
+  esPersonaJuridica?: boolean;
+  observacionesPropietario?: string;
+  observacionesPrivadas?: string;
+}
 
 export const getPersonasFisicas = async (rol?: string): Promise<PersonaFisica[]> => {
   try {
@@ -216,7 +234,46 @@ export const deletePersonaJuridica = async (id: number | string): Promise<boolea
     }
     return true;
   } catch (error) {
-    console.error(`Error al eliminar persona jurídica con ID ${id}:`, error);
-    return false;
+    console.error(`Error al eliminar persona jurídica con ID ${id}:`, error);    return false;
+  }
+};
+
+// Funciones para asignar roles
+export const asignarRolInquilino = async (personaId: number, inquilinoData: InquilinoDTO): Promise<any> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/personas/${personaId}/roles/inquilino`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(inquilinoData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al asignar rol de inquilino:', error);
+    return null;
+  }
+};
+
+export const asignarRolPropietario = async (personaId: number, propietarioData: PropietarioDTO): Promise<any> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/personas/${personaId}/roles/propietario`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(propietarioData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al asignar rol de propietario:', error);    return false;
   }
 };
