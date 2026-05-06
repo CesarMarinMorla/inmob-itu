@@ -41,8 +41,8 @@ export default function PropietariosPage() {
   }, []);
 
   const loadPropietarios = async () => {
-    const data = await getPersonasFisicas();
-    const data2 = await getPersonasJuridicas();
+    const data = await getPersonasFisicas('propietario');
+    const data2 = await getPersonasJuridicas('propietario');
     setPropietarios([...data, ...data2]);
   };
 
