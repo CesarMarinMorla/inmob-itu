@@ -63,7 +63,7 @@ describe('InquilinosPage Component', () => {
 
     // Wait for the async load to settle to avoid act() warnings
     await waitFor(() => {
-      expect(personasService.getPersonasFisicas).toHaveBeenCalled();
+      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith('inquilino');
     });
   });
 

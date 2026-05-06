@@ -81,13 +81,16 @@ export default function HomePage() {
             height: 280,
             border: '1px solid',
             borderColor: 'divider',
-            opacity: 0.5,
             boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
             transition: 'all 0.2s',
+            '&:hover': {
+              boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.15)',
+              transform: 'translateY(-4px)',
+            },
           }}
         >
           <CardActionArea
-            disabled
+
             onClick={() => navigate('/inquilinos')}
             sx={{
               height: '100%',
@@ -107,8 +110,8 @@ export default function HomePage() {
                 textAlign: 'center',
               }}
             >
-              <Icon baseClassName="material-symbols-outlined" sx={{ fontSize: 100, color: 'text.disabled' }}>vpn_key</Icon>
-              <Typography variant="h5" component="h3" sx={{ fontWeight: 500, color: 'text.disabled' }}>
+              <Icon baseClassName="material-symbols-outlined" sx={{ fontSize: 100, color: 'text.primary' }}>vpn_key</Icon>
+              <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
                 Ver Inquilinos
               </Typography>
             </CardContent>

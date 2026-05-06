@@ -39,8 +39,8 @@ export default function InquilinosPage() {
   }, []);
 
   const loadInquilinos = async () => {
-    const dataFisicas = await getPersonasFisicas();
-    const dataJuridicas = await getPersonasJuridicas();
+    const dataFisicas = await getPersonasFisicas('inquilino');
+    const dataJuridicas = await getPersonasJuridicas('inquilino');
     setInquilinos([...dataFisicas, ...dataJuridicas]);
   };
 

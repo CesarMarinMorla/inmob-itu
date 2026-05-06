@@ -137,9 +137,10 @@ export const deletePersonaFisica = async (id: number | string): Promise<boolean>
 
 // Personas Jurídicas
 
-export const getPersonasJuridicas = async (): Promise<PersonaJuridica[]> => {
+export const getPersonasJuridicas = async (rol?: string): Promise<PersonaJuridica[]> => {
   try {
-    const response = await fetch(API_PERSONAS_JURIDICAS_URL);
+    const url = rol ? `${API_PERSONAS_JURIDICAS_URL}?rol=${rol}` : API_PERSONAS_JURIDICAS_URL;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }

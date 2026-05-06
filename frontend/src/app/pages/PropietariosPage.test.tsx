@@ -62,7 +62,7 @@ describe('PropietariosPage Component', () => {
     expect(screen.getByRole('button', { name: /nuevo propietario/i })).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(personasService.getPersonasFisicas).toHaveBeenCalled();
+      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith('propietario');
     });
   });
 

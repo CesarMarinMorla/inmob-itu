@@ -147,6 +147,19 @@ describe('Personas Service', () => {
       expect(result).toEqual(mockData);
     });
 
+    it('getPersonasJuridicas should append rol parameter if provided', async () => {
+      const mockData = [mockPersonaJuridica];
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        json: async () => mockData
+      });
+
+      const result = await personasService.getPersonasJuridicas('propietario');
+      
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas?rol=propietario');
+      expect(result).toEqual(mockData);
+    });
+
     it('createPersonaJuridica should send correct POST request', async () => {
       (global.fetch as any).mockResolvedValue({
         ok: true,
