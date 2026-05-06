@@ -1,0 +1,46 @@
+package com.inmob2.backend.controller;
+
+import com.inmob2.backend.model.dto.propiedad.DepartamentoDTO;
+import com.inmob2.backend.service.DepartamentoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/departamentos")
+@RequiredArgsConstructor
+public class DepartamentoController {
+
+    private final DepartamentoService departamentoService;
+
+    @GetMapping
+    public ResponseEntity<List<DepartamentoDTO>> listarTodos() {
+        return ResponseEntity.ok(departamentoService.obtenerTodos());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartamentoDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(departamentoService.obtenerPorId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<DepartamentoDTO> crearDepartamento(@Valid @RequestBody DepartamentoDTO dto) {
+        DepartamentoDTO guardado = departamentoService.guardar(dto);
+        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartamentoDTO> actualizarDepartamento(@PathVariable Long id, @Valid @RequestBody DepartamentoDTO dto) {
+        return ResponseEntity.ok(departamentoService.actualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarDepartamento(@PathVariable Long id) {
+        departamentoService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
+}
