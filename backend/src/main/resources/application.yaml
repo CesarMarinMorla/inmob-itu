@@ -2,10 +2,10 @@ spring:
   application:
     name: backend
   datasource:
-    url: jdbc:mysql://localhost:3306/inmob_db
-    username: root
+    url: jdbc:h2:file:./data/inmob_db;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
     password:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,6 +13,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
 
-# Configuracion 
+argly:
+  api:
+    base-url: https://api.argly.com.ar/api
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000

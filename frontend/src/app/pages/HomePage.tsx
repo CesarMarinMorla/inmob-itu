@@ -156,4 +156,10 @@ export default function HomePage() {
               <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
                 Ver Inmuebles
               </Typography>
-            </C
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      </Box>
+    </Box>
+  );
+}
