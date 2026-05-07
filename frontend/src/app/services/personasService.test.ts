@@ -6,7 +6,7 @@ const mockPersonaFisica: personasService.PersonaFisica = {
   id: 1,
   primerNombre: 'Juan',
   primerApellido: 'Perez',
-  tipoDocumento: 'DNI',
+  tipoDocumento: 'dni',
   numDocumento: '12345678',
   fechaNacimiento: '1990-01-01',
   telefonos: [],
@@ -28,7 +28,7 @@ describe('Personas Service', () => {
   beforeEach(() => {
     // Reset any previous mocks
     vi.clearAllMocks();
-    
+
     // Mock global fetch
     global.fetch = vi.fn();
   });
@@ -46,7 +46,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.getPersonasFisicas();
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas');
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
@@ -54,11 +54,11 @@ describe('Personas Service', () => {
 
     it('getPersonasFisicas should handle errors and return empty array', async () => {
       (global.fetch as any).mockRejectedValue(new Error('Network error'));
-      
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
       const result = await personasService.getPersonasFisicas();
-      
+
       expect(result).toEqual([]);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -71,7 +71,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.createPersonaFisica(mockPersonaFisica);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.getPersonaFisicaByDni('12345678');
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/12345678');
       expect(result).toEqual(mockPersonaFisica);
     });
@@ -109,7 +109,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.updatePersonaFisica(1, mockPersonaFisica);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +124,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.deletePersonaFisica(1);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
         method: 'DELETE'
       });
@@ -141,7 +141,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.getPersonasJuridicas();
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas');
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
@@ -155,7 +155,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.getPersonasJuridicas('propietario');
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas?rol=propietario');
       expect(result).toEqual(mockData);
     });
@@ -167,7 +167,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.createPersonaJuridica(mockPersonaJuridica);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,7 +193,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.updatePersonaJuridica(2, mockPersonaJuridica);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -208,7 +208,7 @@ describe('Personas Service', () => {
       });
 
       const result = await personasService.deletePersonaJuridica(2);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
         method: 'DELETE'
       });

@@ -25,11 +25,11 @@ const mockFisica: personasService.PersonaFisica = {
   id: 1,
   primerNombre: 'Ana',
   primerApellido: 'Martinez',
-  tipoDocumento: 'DNI',
+  tipoDocumento: 'dni',
   numDocumento: '22222222',
   fechaNacimiento: '1985-01-01',
-  telefonos: [{ numero: '0987654321', tipo: 'CELULAR' }],
-  mails: [{ email: 'ana@test.com', tipo: 'PERSONAL', esPrincipal: true }],
+  telefonos: [{ numero: '0987654321', tipo: 'celular' }],
+  mails: [{ email: 'ana@test.com', tipo: 'personal', esPrincipal: true }],
   direcciones: []
 };
 
@@ -39,7 +39,7 @@ const mockJuridica: personasService.PersonaJuridica = {
   cuit: '30-22222222-9',
   fechaConstitucion: '2005-01-01',
   telefonos: [],
-  mails: [{ email: 'constructora@test.com', tipo: 'LABORAL', esPrincipal: true }],
+  mails: [{ email: 'constructora@test.com', tipo: 'laboral', esPrincipal: true }],
   direcciones: []
 };
 
@@ -52,7 +52,7 @@ describe('PropietariosPage Component', () => {
 
   const renderComponent = () => render(
     <MemoryRouter>
-        <PropietariosPage />
+      <PropietariosPage />
     </MemoryRouter>
   );
 
@@ -89,9 +89,9 @@ describe('PropietariosPage Component', () => {
     expect(await screen.findByText('Ana Martinez')).toBeInTheDocument();
 
     const searchInput = screen.getByRole('textbox', { name: /buscar propietarios/i });
-    
+
     fireEvent.change(searchInput, { target: { value: 'Constructora' } });
-    
+
     expect(screen.getByText('Constructora SA')).toBeInTheDocument();
     expect(screen.queryByText('Ana Martinez')).not.toBeInTheDocument();
   });
@@ -101,21 +101,21 @@ describe('PropietariosPage Component', () => {
     (personasService.deletePersonaFisica as any).mockResolvedValue(true);
 
     renderComponent();
-    
+
     expect(await screen.findByText('Ana Martinez')).toBeInTheDocument();
 
     const deleteBtn = screen.getByRole('button', { name: /eliminar ana martinez/i });
     fireEvent.click(deleteBtn);
 
     expect(screen.getByRole('dialog', { name: /confirmar eliminación/i })).toBeInTheDocument();
-    
+
     const confirmBtn = screen.getByRole('button', { name: 'Eliminar' });
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-        expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
+      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
     });
-    
+
     expect(screen.getByText(/propietario eliminado exitosamente/i)).toBeInTheDocument();
   });
 });
