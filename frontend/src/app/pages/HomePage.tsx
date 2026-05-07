@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { Box, Typography, Card, CardActionArea, CardContent, Icon } from '@mui/material';
+import IndicadoresPanel from '../components/IndicadoresPanel';
 // Icons not needed anymore if we use Material Symbols Outlined through Icon component
 
 export default function HomePage() {
@@ -24,6 +25,8 @@ export default function HomePage() {
           ¿Qué deseas hacer hoy?
         </Typography>
       </Box>
+
+      <IndicadoresPanel />
 
       <Box
         sx={{
@@ -153,10 +156,4 @@ export default function HomePage() {
               <Typography variant="h5" component="h3" sx={{ fontWeight: 500 }}>
                 Ver Inmuebles
               </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      </Box>
-    </Box>
-  );
-}
+            </C
