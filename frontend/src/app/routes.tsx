@@ -10,22 +10,34 @@ import EditarInquilinoPage from "./pages/EditarInquilinoPage";
 import InmueblesPage from "./pages/InmueblesPage";
 import NuevoInmueblePage from "./pages/NuevoInmueblePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import LoginPage from "./pages/LoginPage";
+import AdminRoute from "./components/AdminRoute";
 
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    Component: LoginPage,
+  },
+  {
     path: "/",
-    Component: Layout,
+    Component: AdminRoute,
     children: [
-      { index: true, Component: HomePage },
-      { path: "propietarios", Component: PropietariosPage },
-      { path: "propietarios/nuevo", Component: NuevoPropietarioPage },
-      { path: "propietarios/:id/editar", Component: EditarPropietarioPage },
-      { path: "inquilinos", Component: InquilinosPage },
-      { path: "inquilinos/nuevo", Component: NuevoInquilinoPage },
-      { path: "inquilinos/:id/editar", Component: EditarInquilinoPage },
-      { path: "inmuebles", Component: InmueblesPage },
-      { path: "inmuebles/nuevo", Component: NuevoInmueblePage },
-      { path: "*", Component: NotFoundPage },
+      {
+        path: "/",
+        Component: Layout,
+        children: [
+          { index: true, Component: HomePage },
+          { path: "propietarios", Component: PropietariosPage },
+          { path: "propietarios/nuevo", Component: NuevoPropietarioPage },
+          { path: "propietarios/:id/editar", Component: EditarPropietarioPage },
+          { path: "inquilinos", Component: InquilinosPage },
+          { path: "inquilinos/nuevo", Component: NuevoInquilinoPage },
+          { path: "inquilinos/:id/editar", Component: EditarInquilinoPage },
+          { path: "inmuebles", Component: InmueblesPage },
+          { path: "inmuebles/nuevo", Component: NuevoInmueblePage },
+          { path: "*", Component: NotFoundPage },
+        ],
+      },
     ],
   },
 ]);
