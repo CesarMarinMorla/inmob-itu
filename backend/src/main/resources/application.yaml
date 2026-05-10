@@ -14,3 +14,9 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-1kd2aymzw2vebr77.us.auth0.com/
+          audiences: https://inmob2-api
