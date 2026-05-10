@@ -32,5 +32,8 @@ public abstract class PropiedadDTO {
     private DireccionPropiedadDTO direccion;
 
     // Recibiremos solo los IDs de los propietarios para vincularlos a la propiedad
+    // Descomentar la siguiente línea si el negocio exige que toda propiedad nazca con al menos 1 dueño:
+    // @jakarta.validation.constraints.NotEmpty(message = "La propiedad debe tener al menos un dueño asignado")
     private List<Long> dueniosIds = new ArrayList<>();
 }
+

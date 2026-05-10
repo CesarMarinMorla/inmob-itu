@@ -9,7 +9,7 @@ export default function Sidebar() {
   const menuItems = [
     { text: 'Inicio', icon: <Home />, path: '/', id: 'inicio' },
     { text: 'Propietarios', icon: <Icon baseClassName="material-symbols-outlined">location_away</Icon>, path: '/propietarios', id: 'propietarios' },
-    { text: 'Inquilinos', icon: <Icon baseClassName="material-symbols-outlined">vpn_key</Icon>, path: '/inquilinos', id: 'inquilinos', disabled: true },
+    { text: 'Inquilinos', icon: <Icon baseClassName="material-symbols-outlined">vpn_key</Icon>, path: '/inquilinos', id: 'inquilinos' },
     { text: 'Inmuebles', icon: <Icon baseClassName="material-symbols-outlined">holiday_village</Icon>, path: '/inmuebles', id: 'inmuebles' },
   ];
 
@@ -37,7 +37,6 @@ export default function Sidebar() {
         {menuItems.map((item) => (
           <ListItem key={item.id} disablePadding sx={{ mb: 2 }}>
             <ListItemButton
-              disabled={item.disabled}
               onClick={() => navigate(item.path)}
               sx={{
                 flexDirection: 'column',
@@ -50,13 +49,13 @@ export default function Sidebar() {
                   bgcolor: isActive(item.path) ? 'rgba(122, 0, 0, 0.12)' : 'rgba(0, 0, 0, 0.04)',
                 },
               }}
-              aria-label={item.disabled ? `Ir a ${item.text} (Próximamente)` : `Ir a ${item.text}`}
+              aria-label={`Ir a ${item.text}`}
               aria-current={isActive(item.path) ? 'page' : undefined}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 'unset',
-                  color: item.disabled ? 'text.disabled' : isActive(item.path) ? 'primary.main' : 'text.secondary',
+                  color: isActive(item.path) ? 'primary.main' : 'text.secondary',
                 }}
               >
                 {item.icon}
@@ -66,7 +65,7 @@ export default function Sidebar() {
                 primaryTypographyProps={{
                   fontSize: '0.75rem',
                   textAlign: 'center',
-                  color: item.disabled ? 'text.disabled' : isActive(item.path) ? 'primary.main' : 'text.secondary',
+                  color: isActive(item.path) ? 'primary.main' : 'text.secondary',
                   fontWeight: isActive(item.path) ? 600 : 400,
                 }}
               />

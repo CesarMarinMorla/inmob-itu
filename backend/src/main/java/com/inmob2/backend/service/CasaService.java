@@ -25,6 +25,38 @@ public class CasaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public CasaDTO obtenerPorId(Long id) {
+        return casaRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Casa no encontrada con id: " + id));
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        if (!casaRepository.existsById(id))
+            throw new jakarta.persistence.EntityNotFoundException("Casa no encontrada con id: " + id);
+        casaRepository.deleteById(id);
+    }
+
+    @Transactional
+    public CasaDTO actualizar(Long id, CasaDTO dto) {
+        Casa entidad = casaRepository.findById(id)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Casa no encontrada con id: " + id));
+        propiedadMapper.mapearCamposBasePropiedadHaciaEntidad(dto, entidad);
+        entidad.setAmbientesNum(dto.getAmbientesNum());
+        entidad.setDormitoriosNum(dto.getDormitoriosNum());
+        entidad.setBaniosNum(dto.getBaniosNum());
+        entidad.setMascotas(dto.getMascotas());
+        entidad.setAptoProfesional(dto.getAptoProfesional());
+        entidad.setAnioConstruccion(dto.getAnioConstruccion());
+        entidad.setPlantasNum(dto.getPlantasNum());
+        entidad.setJardin(dto.getJardin());
+        entidad.setCochera(dto.getCochera());
+        entidad.setBarrioCerrado(dto.getBarrioCerrado());
+        return mapToDto(casaRepository.save(entidad));
+    }
+
     @Transactional
     public CasaDTO guardar(CasaDTO dto) {
         Casa casa = mapToEntity(dto);

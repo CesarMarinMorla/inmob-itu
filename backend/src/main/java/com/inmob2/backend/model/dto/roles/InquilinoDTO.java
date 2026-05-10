@@ -10,11 +10,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class InquilinoDTO extends RolExternoDTO {
 
-    @NotBlank(message = "La ocupación principal es obligatoria")
+    // @NotBlank(message = "La ocupación principal es obligatoria")
     @Size(max = 100, message = "La ocupación no puede exceder los 100 caracteres")
     private String ocupacionPrincipal;
 
-    @NotNull(message = "Los ingresos mensuales son obligatorios")
+    // @NotNull(message = "Los ingresos mensuales son obligatorios")
     private Double ingresosMensuales;
 
     private Integer antiguedadLaboral;

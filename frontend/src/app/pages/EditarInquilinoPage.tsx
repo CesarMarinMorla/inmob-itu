@@ -63,7 +63,7 @@ export default function EditarInquilinoPage() {
   const [segundoNombre, setSegundoNombre] = useState('');
   const [primerApellido, setPrimerApellido] = useState('');
   const [segundoApellido, setSegundoApellido] = useState('');
-  const [tipoDocumento, setTipoDocumento] = useState<'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte'>('DNI');
+  const [tipoDocumento, setTipoDocumento] = useState<'dni' | 'cuit' | 'cuil' | 'pasaporte'>('dni');
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
@@ -71,8 +71,8 @@ export default function EditarInquilinoPage() {
   const [fechaConstitucion, setFechaConstitucion] = useState('');
   const [nombreNegocio, setNombreNegocio] = useState('');
   // const [email, setEmail] = useState(''); // Removed
-  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
-  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
+  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'celular' }]);
+  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'personal', esPrincipal: true }]);
 
   const [calle, setCalle] = useState('');
   const [altura, setAltura] = useState('');
@@ -82,7 +82,7 @@ export default function EditarInquilinoPage() {
   const [provincia, setProvincia] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
-  const [tipoDomicilio, setTipoDomicilio] = useState<'REAL' | 'LEGAL' | 'CONSTITUIDO' | 'LABORAL' | 'SOCIAL' | 'FISCAL' | 'SUCURSAL'>('REAL');
+  const [tipoDomicilio, setTipoDomicilio] = useState<'legal' | 'particular' | 'comercial'>('particular');
 
   const [propietariosVinculados, setPropietariosVinculados] = useState<Propietario[]>([]);
   const [selectedPropietario, setSelectedPropietario] = useState<Propietario | null>(null);
@@ -96,7 +96,7 @@ export default function EditarInquilinoPage() {
   ];
 
   const handleAddTelefono = () => {
-    setTelefonos([...telefonos, { numero: '', tipo: 'CELULAR' }]);
+    setTelefonos([...telefonos, { numero: '', tipo: 'celular' }]);
   };
 
   const handleRemoveTelefono = (index: number) => {
@@ -110,7 +110,7 @@ export default function EditarInquilinoPage() {
   };
 
   const handleAddMail = () => {
-    setMails([...mails, { email: '', tipo: 'PERSONAL', esPrincipal: mails.length === 0 }]);
+    setMails([...mails, { email: '', tipo: 'personal', esPrincipal: mails.length === 0 }]);
   };
 
   const handleRemoveMail = (index: number) => {
@@ -135,7 +135,7 @@ export default function EditarInquilinoPage() {
       if (id) {
         let isEmpresa = false;
         let inquilino: any = await getPersonaFisicaByDni(id);
-        
+
         if (!inquilino) {
           inquilino = await getPersonaJuridicaByCuit(id);
           isEmpresa = !!inquilino;
@@ -144,22 +144,22 @@ export default function EditarInquilinoPage() {
         if (inquilino) {
           if (inquilino.id) setPersonaId(inquilino.id);
           setTipo(isEmpresa ? 'empresa' : 'persona');
-          
+
           if (isEmpresa) {
-              setRazonSocial(inquilino.razonSocial || '');
-              setCuit(inquilino.cuit || '');
-              setFechaConstitucion(inquilino.fechaConstitucion || '');
-              setNombreNegocio(inquilino.nombreNegocio || '');
+            setRazonSocial(inquilino.razonSocial || '');
+            setCuit(inquilino.cuit || '');
+            setFechaConstitucion(inquilino.fechaConstitucion || '');
+            setNombreNegocio(inquilino.nombreNegocio || '');
           } else {
-              setPrimerNombre(inquilino.primerNombre || '');
-              setSegundoNombre(inquilino.segundoNombre || '');
-              setPrimerApellido(inquilino.primerApellido || '');
-              setSegundoApellido(inquilino.segundoApellido || '');
-              setTipoDocumento(inquilino.tipoDocumento || 'DNI');
-              setNumeroDocumento(inquilino.numDocumento || '');
-              setFechaNacimiento(inquilino.fechaNacimiento || '');
+            setPrimerNombre(inquilino.primerNombre || '');
+            setSegundoNombre(inquilino.segundoNombre || '');
+            setPrimerApellido(inquilino.primerApellido || '');
+            setSegundoApellido(inquilino.segundoApellido || '');
+            setTipoDocumento(inquilino.tipoDocumento || 'dni');
+            setNumeroDocumento(inquilino.numDocumento || '');
+            setFechaNacimiento(inquilino.fechaNacimiento || '');
           }
-          
+
           if (inquilino.telefonos && inquilino.telefonos.length > 0) {
             setTelefonos(inquilino.telefonos);
           }
@@ -176,9 +176,9 @@ export default function EditarInquilinoPage() {
             setProvincia(dir.provincia || '');
             setLocalidad(dir.localidad || '');
             setCodigoPostal(dir.codigoPostal || '');
-            setTipoDomicilio(dir.tipoDomicilio || (isEmpresa ? 'SOCIAL' : 'REAL'));
+            setTipoDomicilio(dir.tipoDomicilio || 'particular');
           }
-          
+
           setPropietariosVinculados(getPropietariosByInquilinoId(id));
         } else {
           setSnackbar({ open: true, message: 'Inquilino no encontrado en el servidor', severity: 'error' });
@@ -229,26 +229,26 @@ export default function EditarInquilinoPage() {
     let updated = null;
 
     if (tipo === 'persona') {
-        const personaData = {
-          ...commonData,
-          primerNombre,
-          segundoNombre,
-          primerApellido,
-          segundoApellido,
-          tipoDocumento,
-          numDocumento: numeroDocumento,
-          fechaNacimiento,
-        };
-        updated = await updatePersonaFisica(personaId, personaData as any);
+      const personaData = {
+        ...commonData,
+        primerNombre,
+        segundoNombre,
+        primerApellido,
+        segundoApellido,
+        tipoDocumento,
+        numDocumento: numeroDocumento,
+        fechaNacimiento,
+      };
+      updated = await updatePersonaFisica(personaId, personaData as any);
     } else {
-        const empresaData = {
-          ...commonData,
-          razonSocial,
-          cuit,
-          fechaConstitucion,
-          nombreNegocio,
-        };
-        updated = await updatePersonaJuridica(personaId, empresaData as any);
+      const empresaData = {
+        ...commonData,
+        razonSocial,
+        cuit,
+        fechaConstitucion,
+        nombreNegocio,
+      };
+      updated = await updatePersonaJuridica(personaId, empresaData as any);
     }
 
     if (updated) {
@@ -336,12 +336,7 @@ export default function EditarInquilinoPage() {
                   <ToggleButtonGroup
                     value={tipo}
                     exclusive
-                    onChange={(_, newTipo) => {
-                      if (newTipo) {
-                        setTipo(newTipo);
-                        setTipoDomicilio(newTipo === 'persona' ? 'REAL' : 'SOCIAL');
-                      }
-                    }}
+                    onChange={(_, newTipo) => newTipo && setTipo(newTipo)}
                     aria-label="Tipo de inquilino"
                     fullWidth
                   >
@@ -417,10 +412,10 @@ export default function EditarInquilinoPage() {
                           onChange={(e) => setTipoDocumento(e.target.value as any)}
                           required
                         >
-                          <MenuItem value="DNI">DNI</MenuItem>
-                          <MenuItem value="CUIT">CUIT</MenuItem>
-                          <MenuItem value="CUIL">CUIL</MenuItem>
-                          <MenuItem value="Pasaporte">Pasaporte</MenuItem>
+                          <MenuItem value="dni">DNI</MenuItem>
+                          <MenuItem value="cuit">CUIT</MenuItem>
+                          <MenuItem value="cuil">CUIL</MenuItem>
+                          <MenuItem value="pasaporte">Pasaporte</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 8 }}>
@@ -495,206 +490,200 @@ export default function EditarInquilinoPage() {
                   </>
                 )}
 
-            <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, mt: 3, fontWeight: 600 }}>
-              Información de Contacto
-            </Typography>
-            
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Teléfonos</Typography>
-              {telefonos.map((tel, index) => (
-                <Grid container spacing={2} sx={{ mb: 2 }} key={`tel-${index}`}>
+                <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, mt: 3, fontWeight: 600 }}>
+                  Información de Contacto
+                </Typography>
+
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Teléfonos</Typography>
+                  {telefonos.map((tel, index) => (
+                    <Grid container spacing={2} sx={{ mb: 2 }} key={`tel-${index}`}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField
+                          fullWidth
+                          label="Número de teléfono"
+                          value={tel.numero}
+                          onChange={(e) => handleTelefonoChange(index, 'numero', e.target.value)}
+                          placeholder="+54 9 XXX XXX XXXX"
+                          required={index === 0}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <TextField
+                          select
+                          fullWidth
+                          label="Tipo"
+                          value={tel.tipo}
+                          onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'celular' | 'fijo' | 'trabajo')}
+                        >
+                          <MenuItem value="celular">Celular</MenuItem>
+                          <MenuItem value="fijo">Fijo</MenuItem>
+                          <MenuItem value="trabajo">Trabajo</MenuItem>
+                        </TextField>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                        {index > 0 && (
+                          <IconButton color="error" onClick={() => handleRemoveTelefono(index)}>
+                            <RemoveCircleOutline />
+                          </IconButton>
+                        )}
+                        {index === telefonos.length - 1 && (
+                          <IconButton color="primary" onClick={handleAddTelefono}>
+                            <AddCircleOutline />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Box>
+
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Mails</Typography>
+                  {mails.map((mail, index) => (
+                    <Grid container spacing={2} sx={{ mb: 2 }} key={`mail-${index}`}>
+                      <Grid size={{ xs: 12, sm: 5 }}>
+                        <TextField
+                          fullWidth
+                          type="email"
+                          label="Correo electrónico"
+                          value={mail.email}
+                          onChange={(e) => handleMailChange(index, 'email', e.target.value)}
+                          required={index === 0}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 3 }}>
+                        <TextField
+                          select
+                          fullWidth
+                          label="Tipo"
+                          value={mail.tipo}
+                          onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'personal' | 'laboral')}
+                        >
+                          <MenuItem value="personal">Personal</MenuItem>
+                          <MenuItem value="laboral">Laboral</MenuItem>
+                        </TextField>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                        <FormControlLabel
+                          value="principal"
+                          control={<Radio checked={mail.esPrincipal} onChange={() => handleMailChange(index, 'esPrincipal', true)} />}
+                          label="Principal"
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        {index > 0 && (
+                          <IconButton color="error" onClick={() => handleRemoveMail(index)}>
+                            <RemoveCircleOutline />
+                          </IconButton>
+                        )}
+                        {index === mails.length - 1 && (
+                          <IconButton color="primary" onClick={handleAddMail}>
+                            <AddCircleOutline />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Box>
+
+                <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
+                  Dirección
+                </Typography>
+                <Grid container spacing={2} sx={{ mb: 2 }}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       fullWidth
-                      label="Número de teléfono"
-                      value={tel.numero}
-                      onChange={(e) => handleTelefonoChange(index, 'numero', e.target.value)}
-                      placeholder="+54 9 XXX XXX XXXX"
-                      required={index === 0}
+                      label="Calle"
+                      value={calle}
+                      onChange={(e) => setCalle(e.target.value)}
+                      required
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <TextField
-                      select
-                      fullWidth
-                      label="Tipo"
-                      value={tel.tipo}
-                      onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'CELULAR' | 'FIJO')}
-                    >
-                      <MenuItem value="CELULAR">Celular</MenuItem>
-                      <MenuItem value="FIJO">Fijo</MenuItem>
-                    </TextField>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
-                    {index > 0 && (
-                      <IconButton color="error" onClick={() => handleRemoveTelefono(index)}>
-                        <RemoveCircleOutline />
-                      </IconButton>
-                    )}
-                    {index === telefonos.length - 1 && (
-                      <IconButton color="primary" onClick={handleAddTelefono}>
-                        <AddCircleOutline />
-                      </IconButton>
-                    )}
-                  </Grid>
-                </Grid>
-              ))}
-            </Box>
-
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>Mails</Typography>
-              {mails.map((mail, index) => (
-                <Grid container spacing={2} sx={{ mb: 2 }} key={`mail-${index}`}>
-                  <Grid size={{ xs: 12, sm: 5 }}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       fullWidth
-                      type="email"
-                      label="Correo electrónico"
-                      value={mail.email}
-                      onChange={(e) => handleMailChange(index, 'email', e.target.value)}
-                      required={index === 0}
+                      label="Altura"
+                      value={altura}
+                      onChange={(e) => setAltura(e.target.value)}
+                      required
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       select
                       fullWidth
-                      label="Tipo"
-                      value={mail.tipo}
-                      onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'PERSONAL' | 'LABORAL')}
+                      label="Tipo de Domicilio"
+                      value={tipoDomicilio}
+                      onChange={(e) => setTipoDomicilio(e.target.value as 'legal' | 'particular' | 'comercial')}
                     >
-                      <MenuItem value="PERSONAL">Personal</MenuItem>
-                      <MenuItem value="LABORAL">Laboral</MenuItem>
+                      <MenuItem value="particular">Particular</MenuItem>
+                      <MenuItem value="legal">Legal</MenuItem>
+                      <MenuItem value="comercial">Comercial</MenuItem>
                     </TextField>
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControlLabel
-                      value="principal"
-                      control={<Radio checked={mail.esPrincipal} onChange={() => handleMailChange(index, 'esPrincipal', true)} />}
-                      label="Principal"
+                </Grid>
+
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextField
+                      fullWidth
+                      label="Piso"
+                      value={piso}
+                      onChange={(e) => setPiso(e.target.value)}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    {index > 0 && (
-                      <IconButton color="error" onClick={() => handleRemoveMail(index)}>
-                        <RemoveCircleOutline />
-                      </IconButton>
-                    )}
-                    {index === mails.length - 1 && (
-                      <IconButton color="primary" onClick={handleAddMail}>
-                        <AddCircleOutline />
-                      </IconButton>
-                    )}
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextField
+                      fullWidth
+                      label="Departamento"
+                      value={departamento}
+                      onChange={(e) => setDepartamento(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextField
+                      fullWidth
+                      label="Barrio"
+                      value={barrio}
+                      onChange={(e) => setBarrio(e.target.value)}
+                    />
                   </Grid>
                 </Grid>
-              ))}
-            </Box>
 
-            <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
-              Dirección
-            </Typography>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Provincia"
+                      value={provincia}
+                      onChange={(e) => setProvincia(e.target.value)}
+                      required
+                    >
+                      {provinciasArgentinas.map((prov) => (
+                        <MenuItem key={prov} value={prov}>
+                          {prov}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Localidad"
+                      value={localidad}
+                      onChange={(e) => setLocalidad(e.target.value)}
+                      required
+                    />
+                  </Grid>
+                </Grid>
                 <TextField
                   fullWidth
-                  label="Calle"
-                  value={calle}
-                  onChange={(e) => setCalle(e.target.value)}
-                  required
+                  label="Código Postal"
+                  value={codigoPostal}
+                  onChange={(e) => setCodigoPostal(e.target.value)}
+                  sx={{ mb: 4 }}
                 />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <TextField
-                  fullWidth
-                  label="Altura"
-                  value={altura}
-                  onChange={(e) => setAltura(e.target.value)}
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 3 }}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Tipo de Domicilio"
-                  value={tipoDomicilio}
-                  onChange={(e) => setTipoDomicilio(e.target.value as any)}
-                >
-                  {tipo === 'persona' ? [
-                    <MenuItem key="REAL" value="REAL">Real</MenuItem>,
-                    <MenuItem key="LEGAL" value="LEGAL">Legal</MenuItem>,
-                    <MenuItem key="CONSTITUIDO" value="CONSTITUIDO">Constituido</MenuItem>,
-                    <MenuItem key="LABORAL" value="LABORAL">Laboral</MenuItem>
-                  ] : [
-                    <MenuItem key="SOCIAL" value="SOCIAL">Social</MenuItem>,
-                    <MenuItem key="FISCAL" value="FISCAL">Fiscal</MenuItem>,
-                    <MenuItem key="SUCURSAL" value="SUCURSAL">Sucursal</MenuItem>
-                  ]}
-                </TextField>
-              </Grid>
-            </Grid>
-
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  label="Piso"
-                  value={piso}
-                  onChange={(e) => setPiso(e.target.value)}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  label="Departamento"
-                  value={departamento}
-                  onChange={(e) => setDepartamento(e.target.value)}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  label="Barrio"
-                  value={barrio}
-                  onChange={(e) => setBarrio(e.target.value)}
-                />
-              </Grid>
-            </Grid>
-            
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Provincia"
-                  value={provincia}
-                  onChange={(e) => setProvincia(e.target.value)}
-                  required
-                >
-                  {provinciasArgentinas.map((prov) => (
-                    <MenuItem key={prov} value={prov}>
-                      {prov}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Localidad"
-                  value={localidad}
-                  onChange={(e) => setLocalidad(e.target.value)}
-                  required
-                />
-              </Grid>
-            </Grid>
-            <TextField
-              fullWidth
-              label="Código Postal"
-              value={codigoPostal}
-              onChange={(e) => setCodigoPostal(e.target.value)}
-              sx={{ mb: 4 }}
-            />
 
                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                   <Button variant="outlined" onClick={() => navigate('/inquilinos')} size="large">

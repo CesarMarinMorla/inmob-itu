@@ -39,21 +39,21 @@ export default function InquilinosPage() {
   }, []);
 
   const loadInquilinos = async () => {
-    const dataFisicas = await getPersonasFisicas();
-    const dataJuridicas = await getPersonasJuridicas();
+    const dataFisicas = await getPersonasFisicas('inquilino');
+    const dataJuridicas = await getPersonasJuridicas('inquilino');
     setInquilinos([...dataFisicas, ...dataJuridicas]);
   };
 
   const filteredInquilinos = inquilinos.filter((inq) => {
     const searchLower = searchTerm.toLowerCase();
-    
+
     // Type guard checks
     const isFisica = 'primerNombre' in inq;
-    
-    const nombre = isFisica 
+
+    const nombre = isFisica
       ? `${inq.primerNombre} ${inq.primerApellido}`.toLowerCase()
       : `${inq.razonSocial}`.toLowerCase();
-      
+
     const documento = isFisica ? inq.numDocumento : inq.cuit;
     const principalEmail = inq.mails.find(m => m.esPrincipal)?.email?.toLowerCase() || '';
 
@@ -76,12 +76,12 @@ export default function InquilinosPage() {
 
   const confirmDelete = async () => {
     if (!selectedId || !deleteTipo) return;
-    
+
     let success = false;
     if (deleteTipo === 'fisica') {
-        success = await deletePersonaFisica(selectedId.toString());
+      success = await deletePersonaFisica(selectedId.toString());
     } else {
-        success = await deletePersonaJuridica(selectedId.toString());
+      success = await deletePersonaJuridica(selectedId.toString());
     }
     if (success) {
       setSnackbar({ open: true, message: 'Inquilino eliminado exitosamente', severity: 'success' });
@@ -96,17 +96,17 @@ export default function InquilinosPage() {
 
   const getNombreCompleto = (inq: PersonaFisica | PersonaJuridica): string => {
     if ('primerNombre' in inq) {
-        return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
+      return `${inq.primerNombre || ''} ${inq.segundoNombre || ''} ${inq.primerApellido || ''} ${inq.segundoApellido || ''}`.trim();
     } else {
-        return inq.razonSocial || '';
+      return inq.razonSocial || '';
     }
   };
 
   const getDocumento = (inq: PersonaFisica | PersonaJuridica): string => {
     if ('numDocumento' in inq) {
-        return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
+      return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
     } else {
-        return `CUIT ${inq.cuit || ''}`;
+      return `CUIT ${inq.cuit || ''}`;
     }
   };
 
