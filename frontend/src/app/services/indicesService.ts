@@ -10,11 +10,9 @@ export interface IndicesConsolidadosDTO {
   errorApi: boolean;
 }
 
-const API_INDICES_URL = 'http://localhost:8080/api/v1/indices';
-
-export const getIndicesConsolidados = async (): Promise<IndicesConsolidadosDTO | null> => {
+export const getIndicesConsolidados = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>): Promise<IndicesConsolidadosDTO | null> => {
   try {
-    const response = await fetch(API_INDICES_URL);
+    const response = await fetchWithToken('/indices');
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
