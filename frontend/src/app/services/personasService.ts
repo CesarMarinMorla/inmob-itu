@@ -46,9 +46,7 @@ export interface PersonaJuridica {
   direcciones: Direccion[];
 }
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
-const API_PERSONAS_FISICAS_URL = `${API_BASE_URL}/personas-fisicas`;
-const API_PERSONAS_JURIDICAS_URL = `${API_BASE_URL}/personas-juridicas`;
+
 
 // Tipos para roles
 export interface InquilinoDTO {
@@ -68,10 +66,10 @@ export interface PropietarioDTO {
   observacionesPrivadas?: string;
 }
 
-export const getPersonasFisicas = async (rol?: string): Promise<PersonaFisica[]> => {
+export const getPersonasFisicas = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, rol?: string): Promise<PersonaFisica[]> => {
   try {
-    const url = rol ? `${API_PERSONAS_FISICAS_URL}?rol=${rol}` : API_PERSONAS_FISICAS_URL;
-    const response = await fetch(url);
+    const endpoint = rol ? `/personas-fisicas?rol=${rol}` : '/personas-fisicas';
+    const response = await fetchWithToken(endpoint);
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
@@ -82,9 +80,9 @@ export const getPersonasFisicas = async (rol?: string): Promise<PersonaFisica[]>
   }
 };
 
-export const createPersonaFisica = async (persona: PersonaFisica): Promise<PersonaFisica | null> => {
+export const createPersonaFisica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, persona: PersonaFisica): Promise<PersonaFisica | null> => {
   try {
-    const response = await fetch(API_PERSONAS_FISICAS_URL, {
+    const response = await fetchWithToken('/personas-fisicas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,9 +101,9 @@ export const createPersonaFisica = async (persona: PersonaFisica): Promise<Perso
 };
 
 
-export const getPersonaFisicaByDni = async (dni: string): Promise<PersonaFisica | null> => {
+export const getPersonaFisicaByDni = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, dni: string): Promise<PersonaFisica | null> => {
   try {
-    const response = await fetch(`${API_PERSONAS_FISICAS_URL}/${dni}`);
+    const response = await fetchWithToken(`/personas-fisicas/${dni}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Error HTTP: ${response.status}`);
@@ -117,9 +115,9 @@ export const getPersonaFisicaByDni = async (dni: string): Promise<PersonaFisica 
   }
 };
 
-export const updatePersonaFisica = async (id: number | string, persona: PersonaFisica): Promise<PersonaFisica | null> => {
+export const updatePersonaFisica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, id: number | string, persona: PersonaFisica): Promise<PersonaFisica | null> => {
   try {
-    const response = await fetch(`${API_PERSONAS_FISICAS_URL}/${id}`, {
+    const response = await fetchWithToken(`/personas-fisicas/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -137,9 +135,9 @@ export const updatePersonaFisica = async (id: number | string, persona: PersonaF
   }
 };
 
-export const deletePersonaFisica = async (id: number | string): Promise<boolean> => {
+export const deletePersonaFisica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, id: number | string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_PERSONAS_FISICAS_URL}/${id}`, {
+    const response = await fetchWithToken(`/personas-fisicas/${id}`, {
       method: 'DELETE',
     });
 
@@ -155,10 +153,10 @@ export const deletePersonaFisica = async (id: number | string): Promise<boolean>
 
 // Personas Jurídicas
 
-export const getPersonasJuridicas = async (rol?: string): Promise<PersonaJuridica[]> => {
+export const getPersonasJuridicas = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, rol?: string): Promise<PersonaJuridica[]> => {
   try {
-    const url = rol ? `${API_PERSONAS_JURIDICAS_URL}?rol=${rol}` : API_PERSONAS_JURIDICAS_URL;
-    const response = await fetch(url);
+    const endpoint = rol ? `/personas-juridicas?rol=${rol}` : '/personas-juridicas';
+    const response = await fetchWithToken(endpoint);
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
@@ -169,9 +167,9 @@ export const getPersonasJuridicas = async (rol?: string): Promise<PersonaJuridic
   }
 };
 
-export const createPersonaJuridica = async (persona: PersonaJuridica): Promise<PersonaJuridica | null> => {
+export const createPersonaJuridica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, persona: PersonaJuridica): Promise<PersonaJuridica | null> => {
   try {
-    const response = await fetch(API_PERSONAS_JURIDICAS_URL, {
+    const response = await fetchWithToken('/personas-juridicas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -189,9 +187,9 @@ export const createPersonaJuridica = async (persona: PersonaJuridica): Promise<P
   }
 };
 
-export const getPersonaJuridicaByCuit = async (cuit: string): Promise<PersonaJuridica | null> => {
+export const getPersonaJuridicaByCuit = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, cuit: string): Promise<PersonaJuridica | null> => {
   try {
-    const response = await fetch(`${API_PERSONAS_JURIDICAS_URL}/cuit/${cuit}`);
+    const response = await fetchWithToken(`/personas-juridicas/cuit/${cuit}`);
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`Error HTTP: ${response.status}`);
@@ -203,9 +201,9 @@ export const getPersonaJuridicaByCuit = async (cuit: string): Promise<PersonaJur
   }
 };
 
-export const updatePersonaJuridica = async (id: number | string, persona: PersonaJuridica): Promise<PersonaJuridica | null> => {
+export const updatePersonaJuridica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, id: number | string, persona: PersonaJuridica): Promise<PersonaJuridica | null> => {
   try {
-    const response = await fetch(`${API_PERSONAS_JURIDICAS_URL}/${id}`, {
+    const response = await fetchWithToken(`/personas-juridicas/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -223,9 +221,9 @@ export const updatePersonaJuridica = async (id: number | string, persona: Person
   }
 };
 
-export const deletePersonaJuridica = async (id: number | string): Promise<boolean> => {
+export const deletePersonaJuridica = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, id: number | string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_PERSONAS_JURIDICAS_URL}/${id}`, {
+    const response = await fetchWithToken(`/personas-juridicas/${id}`, {
       method: 'DELETE',
     });
 
@@ -234,14 +232,15 @@ export const deletePersonaJuridica = async (id: number | string): Promise<boolea
     }
     return true;
   } catch (error) {
-    console.error(`Error al eliminar persona jurídica con ID ${id}:`, error);    return false;
+    console.error(`Error al eliminar persona jurídica con ID ${id}:`, error);
+    return false;
   }
 };
 
 // Funciones para asignar roles
-export const asignarRolInquilino = async (personaId: number, inquilinoData: InquilinoDTO): Promise<any> => {
+export const asignarRolInquilino = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, personaId: number, inquilinoData: InquilinoDTO): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/personas/${personaId}/roles/inquilino`, {
+    const response = await fetchWithToken(`/personas/${personaId}/roles/inquilino`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -259,9 +258,9 @@ export const asignarRolInquilino = async (personaId: number, inquilinoData: Inqu
   }
 };
 
-export const asignarRolPropietario = async (personaId: number, propietarioData: PropietarioDTO): Promise<any> => {
+export const asignarRolPropietario = async (fetchWithToken: (endpoint: string, options?: RequestInit) => Promise<Response>, personaId: number, propietarioData: PropietarioDTO): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/personas/${personaId}/roles/propietario`, {
+    const response = await fetchWithToken(`/personas/${personaId}/roles/propietario`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -274,6 +273,7 @@ export const asignarRolPropietario = async (personaId: number, propietarioData: 
     }
     return await response.json();
   } catch (error) {
-    console.error('Error al asignar rol de propietario:', error);    return false;
+    console.error('Error al asignar rol de propietario:', error);
+    return null;
   }
 };

@@ -20,6 +20,7 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Business, Person, ArrowBack, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import {
   createPersonaFisica,
   createPersonaJuridica,
@@ -33,6 +34,7 @@ import {
 
 export default function NuevoInquilinoPage() {
   const navigate = useNavigate();
+  const { fetchWithToken } = useAuthClient();
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -145,11 +147,11 @@ export default function NuevoInquilinoPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaFisica(personaData);
+      const result = await createPersonaFisica(fetchWithToken, personaData);
       if (result && result.id) {
         // Asignar rol de inquilino
         const inquilinoData: InquilinoDTO = {};
-        const rolResult = await asignarRolInquilino(Number(result.id), inquilinoData);
+        const rolResult = await asignarRolInquilino(fetchWithToken, Number(result.id), inquilinoData);
         if (rolResult) {
           setSnackbar({ open: true, message: 'Inquilino creado exitosamente', severity: 'success' });
           setTimeout(() => navigate('/inquilinos'), 1500);
@@ -173,11 +175,11 @@ export default function NuevoInquilinoPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaJuridica(empresaData);
+      const result = await createPersonaJuridica(fetchWithToken, empresaData);
       if (result && result.id) {
         // Asignar rol de inquilino
         const inquilinoData: InquilinoDTO = {};
-        const rolResult = await asignarRolInquilino(Number(result.id), inquilinoData);
+        const rolResult = await asignarRolInquilino(fetchWithToken, Number(result.id), inquilinoData);
         if (rolResult) {
           setSnackbar({ open: true, message: 'Empresa creada exitosamente', severity: 'success' });
           setTimeout(() => navigate('/inquilinos'), 1500);

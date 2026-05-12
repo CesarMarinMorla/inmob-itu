@@ -29,6 +29,7 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Business, Person, ArrowBack, Delete, Add, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import {
   getPersonaFisicaByDni,
   updatePersonaFisica,
@@ -49,6 +50,7 @@ import {
 export default function EditarInquilinoPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { fetchWithToken } = useAuthClient();
   const [loading, setLoading] = useState(true);
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [personaId, setPersonaId] = useState<number | string | null>(null);
@@ -134,10 +136,10 @@ export default function EditarInquilinoPage() {
     const loadInquilino = async () => {
       if (id) {
         let isEmpresa = false;
-        let inquilino: any = await getPersonaFisicaByDni(id);
+        let inquilino: any = await getPersonaFisicaByDni(fetchWithToken, id);
 
         if (!inquilino) {
-          inquilino = await getPersonaJuridicaByCuit(id);
+          inquilino = await getPersonaJuridicaByCuit(fetchWithToken, id);
           isEmpresa = !!inquilino;
         }
 
@@ -188,12 +190,12 @@ export default function EditarInquilinoPage() {
       }
     };
     loadInquilino();
-  }, [id, navigate]);
+  }, [id, navigate, fetchWithToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!id) return;
+    if (!id || !fetchWithToken) return;
 
     if (tipo === 'persona' && (!primerNombre || !primerApellido || !numeroDocumento)) {
       setSnackbar({ open: true, message: 'Por favor complete nombre, apellido y documento', severity: 'error' });
@@ -239,7 +241,7 @@ export default function EditarInquilinoPage() {
         numDocumento: numeroDocumento,
         fechaNacimiento,
       };
-      updated = await updatePersonaFisica(personaId, personaData as any);
+      updated = await updatePersonaFisica(fetchWithToken, personaId, personaData as any);
     } else {
       const empresaData = {
         ...commonData,
@@ -248,7 +250,7 @@ export default function EditarInquilinoPage() {
         fechaConstitucion,
         nombreNegocio,
       };
-      updated = await updatePersonaJuridica(personaId, empresaData as any);
+      updated = await updatePersonaJuridica(fetchWithToken, personaId, empresaData as any);
     }
 
     if (updated) {
