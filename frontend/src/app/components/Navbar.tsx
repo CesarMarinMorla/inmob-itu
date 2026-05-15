@@ -1,7 +1,25 @@
-import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
+"use client";
+
+import { useState } from 'react';
+import { AppBar, Toolbar, Typography, IconButton, Box, Menu, MenuItem } from '@mui/material';
 import { Notifications, AccountCircle } from '@mui/icons-material';
 
 export default function Navbar() {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    // TODO: Implementar lógica de cierre de sesión (ej. Auth0)
+    handleClose();
+  };
+
   return (
     <AppBar
       position="static"
@@ -36,9 +54,27 @@ export default function Navbar() {
             color="inherit"
             aria-label="perfil de usuario"
             sx={{ color: '#F7F7F7' }}
+            onClick={handleMenu}
           >
             <AccountCircle />
           </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>
