@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { AppBar, Toolbar, Typography, IconButton, Box, Menu, MenuItem } from '@mui/material';
 import { Notifications, AccountCircle } from '@mui/icons-material';
 
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout } = useAuth0();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -16,8 +18,12 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    // TODO: Implementar lógica de cierre de sesión (ej. Auth0)
     handleClose();
+    logout({
+      logoutParams: {
+        returnTo: `${window.location.origin}/login`,
+      },
+    });
   };
 
   return (
