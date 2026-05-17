@@ -1,11 +1,7 @@
 package com.inmob2.backend.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.inmob2.backend.model.entity.enums.NivelAcceso;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,13 +17,14 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String sub;
+    @Column(nullable = false, unique = true)
+    private String sub; // Auth0 unique user ID (e.g. "auth0|abc123")
 
-    @Column(nullable = false, length = 20)
-    private String nivelAcceso = "ADMIN";
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NivelAcceso nivelAcceso = NivelAcceso.ADMIN;
 
-    @Column(name = "persona_id", nullable = true)
-    private Long personaId;
-
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "persona_id")
+    private Persona persona; // optional — not all users are domain personas
 }

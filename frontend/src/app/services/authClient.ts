@@ -22,9 +22,12 @@ export const useAuthClient = () => {
       });
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting token or fetching:', error);
-      loginWithRedirect();
+      // Evitar loop infinito: solo redirigir si el error requiere login interactivo
+      if (error?.error === 'login_required' || error?.error === 'consent_required') {
+        loginWithRedirect();
+      }
       throw error;
     }
   }, [getAccessTokenSilently, loginWithRedirect]);
