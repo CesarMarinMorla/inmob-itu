@@ -1,11 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Navigate, Outlet } from "react-router";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Button } from "@mui/material";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 
 export default function AdminRoute() {
-  const { isAuthenticated, isLoading: isAuth0Loading } = useAuth0();
-  const { usuario, isLoading: isUserLoading } = useCurrentUser();
+  const { isAuthenticated, isLoading: isAuth0Loading, logout } = useAuth0();
+  const { usuario, isLoading: isUserLoading, isError } = useCurrentUser();
 
   const isLoading = isAuth0Loading || isUserLoading;
 
@@ -32,10 +32,10 @@ export default function AdminRoute() {
     return <Navigate to="/login" replace />;
   }
 
-  // Verificar el rol obtenido del backend
+  // Verificar el rol obtenido del backend o si hubo un error al obtenerlo
   const isAdmin = usuario?.nivelAcceso === "ADMIN";
 
-  if (!isAdmin) {
+  if (!isAdmin || isError) {
     // Pantalla de Acceso Denegado
     return (
       <Box 
@@ -50,9 +50,18 @@ export default function AdminRoute() {
         <Typography variant="h4" color="error" gutterBottom fontWeight="bold">
           Acceso Denegado
         </Typography>
-        <Typography variant="body1" color="textSecondary" textAlign="center">
-          No tenés permisos de administrador para acceder a esta sección.
+        <Typography variant="body1" color="textSecondary" textAlign="center" sx={{ mb: 3 }}>
+          {isError 
+            ? "Ocurrió un error al verificar tu sesión o no tenés permisos para acceder."
+            : "No tenés permisos de administrador para acceder a esta sección."}
         </Typography>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => logout({ logoutParams: { returnTo: window.location.origin + '/login' } })}
+        >
+          Volver a inicio de sesión
+        </Button>
       </Box>
     );
   }

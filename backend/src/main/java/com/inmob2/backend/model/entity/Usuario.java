@@ -22,7 +22,7 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private NivelAcceso nivelAcceso = NivelAcceso.LECTURA;
+    private NivelAcceso nivelAcceso = NivelAcceso.ADMIN;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "persona_id")
