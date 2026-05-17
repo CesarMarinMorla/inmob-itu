@@ -63,7 +63,7 @@ describe('InquilinosPage Component', () => {
 
     // Wait for the async load to settle to avoid act() warnings
     await waitFor(() => {
-      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith('inquilino');
+      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith(expect.anything(), 'inquilino');
     });
   });
 
@@ -75,12 +75,12 @@ describe('InquilinosPage Component', () => {
 
     // Verify loading of physical person
     expect(await screen.findByText('Carlos Gomez')).toBeInTheDocument();
-    expect(screen.getByText('DNI 11111111')).toBeInTheDocument();
+    expect(screen.getByText('dni 11111111')).toBeInTheDocument();
     expect(screen.getByText('carlos@test.com')).toBeInTheDocument();
 
     // Verify loading of legal person
     expect(screen.getByText('Empresa Test')).toBeInTheDocument();
-    expect(screen.getByText('CUIT 30-11111111-9')).toBeInTheDocument();
+    expect(screen.getByText('cuit 30-11111111-9')).toBeInTheDocument();
     expect(screen.getByText('empresa@test.com')).toBeInTheDocument();
   });
 
@@ -121,7 +121,7 @@ describe('InquilinosPage Component', () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
+      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith(expect.anything(), "1");
     });
 
     // Check if success snackbar pops up

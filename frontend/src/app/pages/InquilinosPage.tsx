@@ -106,9 +106,9 @@ export default function InquilinosPage() {
 
   const getDocumento = (inq: PersonaFisica | PersonaJuridica): string => {
     if ('numDocumento' in inq) {
-      return `${inq.tipoDocumento || 'DNI'} ${inq.numDocumento || ''}`;
+      return `${inq.tipoDocumento || 'dni'} ${inq.numDocumento || ''}`;
     } else {
-      return `CUIT ${inq.cuit || ''}`;
+      return `cuit ${inq.cuit || ''}`;
     }
   };
 

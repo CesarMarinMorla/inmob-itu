@@ -45,9 +45,9 @@ describe('Personas Service', () => {
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasFisicas();
+      const result = await personasService.getPersonasFisicas(global.fetch as any);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas');
+      expect(global.fetch).toHaveBeenCalledWith('/personas-fisicas');
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
     });
@@ -57,7 +57,7 @@ describe('Personas Service', () => {
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
-      const result = await personasService.getPersonasFisicas();
+      const result = await personasService.getPersonasFisicas(global.fetch as any);
 
       expect(result).toEqual([]);
       expect(consoleSpy).toHaveBeenCalled();
@@ -70,9 +70,9 @@ describe('Personas Service', () => {
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.createPersonaFisica(mockPersonaFisica);
+      const result = await personasService.createPersonaFisica(global.fetch as any, mockPersonaFisica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-fisicas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaFisica)
@@ -86,9 +86,9 @@ describe('Personas Service', () => {
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.getPersonaFisicaByDni('12345678');
+      const result = await personasService.getPersonaFisicaByDni(global.fetch as any, '12345678');
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/12345678');
+      expect(global.fetch).toHaveBeenCalledWith('/personas-fisicas/12345678');
       expect(result).toEqual(mockPersonaFisica);
     });
 
@@ -98,7 +98,7 @@ describe('Personas Service', () => {
         status: 404
       });
 
-      const result = await personasService.getPersonaFisicaByDni('000');
+      const result = await personasService.getPersonaFisicaByDni(global.fetch as any, '000');
       expect(result).toBeNull();
     });
 
@@ -108,9 +108,9 @@ describe('Personas Service', () => {
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.updatePersonaFisica(1, mockPersonaFisica);
+      const result = await personasService.updatePersonaFisica(global.fetch as any, 1, mockPersonaFisica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-fisicas/1', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaFisica)
@@ -123,9 +123,9 @@ describe('Personas Service', () => {
         ok: true
       });
 
-      const result = await personasService.deletePersonaFisica(1);
+      const result = await personasService.deletePersonaFisica(global.fetch as any, 1);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-fisicas/1', {
         method: 'DELETE'
       });
       expect(result).toBe(true);
@@ -140,9 +140,9 @@ describe('Personas Service', () => {
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasJuridicas();
+      const result = await personasService.getPersonasJuridicas(global.fetch as any);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas');
+      expect(global.fetch).toHaveBeenCalledWith('/personas-juridicas');
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
     });
@@ -154,9 +154,9 @@ describe('Personas Service', () => {
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasJuridicas('propietario');
+      const result = await personasService.getPersonasJuridicas(global.fetch as any, 'propietario');
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas?rol=propietario');
+      expect(global.fetch).toHaveBeenCalledWith('/personas-juridicas?rol=propietario');
       expect(result).toEqual(mockData);
     });
 
@@ -166,9 +166,9 @@ describe('Personas Service', () => {
         json: async () => mockPersonaJuridica
       });
 
-      const result = await personasService.createPersonaJuridica(mockPersonaJuridica);
+      const result = await personasService.createPersonaJuridica(global.fetch as any, mockPersonaJuridica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-juridicas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaJuridica)
@@ -182,7 +182,7 @@ describe('Personas Service', () => {
         status: 404
       });
 
-      const result = await personasService.getPersonaJuridicaByCuit('000');
+      const result = await personasService.getPersonaJuridicaByCuit(global.fetch as any, '000');
       expect(result).toBeNull();
     });
 
@@ -192,9 +192,9 @@ describe('Personas Service', () => {
         json: async () => mockPersonaJuridica
       });
 
-      const result = await personasService.updatePersonaJuridica(2, mockPersonaJuridica);
+      const result = await personasService.updatePersonaJuridica(global.fetch as any, 2, mockPersonaJuridica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-juridicas/2', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaJuridica)
@@ -207,9 +207,9 @@ describe('Personas Service', () => {
         ok: true
       });
 
-      const result = await personasService.deletePersonaJuridica(2);
+      const result = await personasService.deletePersonaJuridica(global.fetch as any, 2);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
+      expect(global.fetch).toHaveBeenCalledWith('/personas-juridicas/2', {
         method: 'DELETE'
       });
       expect(result).toBe(true);

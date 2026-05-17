@@ -62,7 +62,7 @@ describe('PropietariosPage Component', () => {
     expect(screen.getByRole('button', { name: /nuevo propietario/i })).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith('propietario');
+      expect(personasService.getPersonasFisicas).toHaveBeenCalledWith(expect.anything(), 'propietario');
     });
   });
 
@@ -73,11 +73,11 @@ describe('PropietariosPage Component', () => {
     renderComponent();
 
     expect(await screen.findByText('Ana Martinez')).toBeInTheDocument();
-    expect(screen.getByText('DNI 22222222')).toBeInTheDocument();
+    expect(screen.getByText('dni 22222222')).toBeInTheDocument();
     expect(screen.getByText('ana@test.com')).toBeInTheDocument();
 
     expect(screen.getByText('Constructora SA')).toBeInTheDocument();
-    expect(screen.getByText('CUIT 30-22222222-9')).toBeInTheDocument();
+    expect(screen.getByText('cuit 30-22222222-9')).toBeInTheDocument();
     expect(screen.getByText('constructora@test.com')).toBeInTheDocument();
   });
 
@@ -113,7 +113,7 @@ describe('PropietariosPage Component', () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith("1");
+      expect(personasService.deletePersonaFisica).toHaveBeenCalledWith(expect.anything(), "1");
     });
 
     expect(screen.getByText(/propietario eliminado exitosamente/i)).toBeInTheDocument();
