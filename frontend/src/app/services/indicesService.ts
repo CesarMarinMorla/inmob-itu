@@ -22,3 +22,26 @@ export const getIndicesConsolidados = async (fetchWithToken: (endpoint: string, 
     return null;
   }
 };
+
+export interface IndiceHistorico {
+  id: number;
+  fecha: string;
+  valor: number;
+  tipo: string;
+}
+
+export const getIndices = async (): Promise<IndiceHistorico[]> => {
+  const response = await fetch('/api/v1/indices/historico');
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
+export const getUltimosIndices = async (): Promise<IndiceHistorico> => {
+  const response = await fetch('/api/v1/indices/latest');
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
