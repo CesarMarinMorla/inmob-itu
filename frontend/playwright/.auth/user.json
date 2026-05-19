@@ -1,0 +1,65 @@
+{
+  "cookies": [
+    {
+      "name": "did",
+      "value": "s%3Av0%3A05266257-5513-49ca-9b26-499653f2338e%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.IE01jfFiqnu3DdxQAoH2OW76%2FIRXjJVnFOUGkEqAYRY",
+      "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
+      "path": "/",
+      "expires": 1810710838.158677,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "did_compat",
+      "value": "s%3Av0%3A05266257-5513-49ca-9b26-499653f2338e%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.IE01jfFiqnu3DdxQAoH2OW76%2FIRXjJVnFOUGkEqAYRY",
+      "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
+      "path": "/",
+      "expires": 1810710838.15888,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "auth0",
+      "value": "s%3AdAauXeGtAeOCdl-oLfxSTUNEyLW2X-f9.sHPdM0Yd4XxJfr8GDuP8DQDLkmGkmpyALtsD%2BdiCiMg",
+      "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
+      "path": "/",
+      "expires": 1779412437.540692,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "auth0_compat",
+      "value": "s%3AdAauXeGtAeOCdl-oLfxSTUNEyLW2X-f9.sHPdM0Yd4XxJfr8GDuP8DQDLkmGkmpyALtsD%2BdiCiMg",
+      "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
+      "path": "/",
+      "expires": 1779412437.540813,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_legacy_auth0.wsZI4UzWjp8bc5bjxt3C7RnDbzZGXstu.is.authenticated",
+      "value": "true",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1779239640,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "auth0.wsZI4UzWjp8bc5bjxt3C7RnDbzZGXstu.is.authenticated",
+      "value": "true",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1779239640,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}
