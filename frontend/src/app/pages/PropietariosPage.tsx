@@ -103,7 +103,7 @@ export default function PropietariosPage() {
 
   const getDocumento = (prop: PersonaFisica | PersonaJuridica): string => {
     if ('numDocumento' in prop) {
-      return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+      return `${(prop.tipoDocumento || 'DNI').toUpperCase()} ${prop.numDocumento || ''}`;
     } else {
       return `CUIT ${prop.cuit || ''}`;
     }

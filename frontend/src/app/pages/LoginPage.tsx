@@ -3,7 +3,7 @@ import { Box, Button, Container, Typography, Paper } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 
-export default function LoginPage() {
+export function LoginPage() {
   const { loginWithRedirect } = useAuth0();
 
   return (
@@ -18,7 +18,6 @@ export default function LoginPage() {
         overflow: "hidden",
       }}
     >
-      {/* Elementos decorativos de fondo */}
       <Box
         sx={{
           position: "absolute",
@@ -130,3 +129,5 @@ export default function LoginPage() {
     </Box>
   );
 }
+
+export default LoginPage;
