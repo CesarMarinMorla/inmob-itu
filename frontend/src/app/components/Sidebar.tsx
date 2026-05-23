@@ -11,6 +11,7 @@ export default function Sidebar() {
     { text: 'Propietarios', icon: <Icon baseClassName="material-symbols-outlined">location_away</Icon>, path: '/propietarios', id: 'propietarios' },
     { text: 'Inquilinos', icon: <Icon baseClassName="material-symbols-outlined">vpn_key</Icon>, path: '/inquilinos', id: 'inquilinos' },
     { text: 'Inmuebles', icon: <Icon baseClassName="material-symbols-outlined">holiday_village</Icon>, path: '/inmuebles', id: 'inmuebles' },
+    { text: 'Contratos', icon: <Icon baseClassName="material-symbols-outlined">description</Icon>, path: '/contratos', id: 'contratos' },
   ];
 
   const isActive = (path: string) => {
@@ -90,12 +91,7 @@ export default function Sidebar() {
             aria-label="Configuración"
             disabled
           >
-            <ListItemIcon
-              sx={{
-                minWidth: 'unset',
-                color: 'text.disabled',
-              }}
-            >
+            <ListItemIcon sx={{ minWidth: 'unset', color: 'text.disabled' }}>
               <Settings />
             </ListItemIcon>
             <ListItemText

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import {
   Box,
   Typography,
@@ -15,16 +15,17 @@ import {
   CardContent,
   Snackbar,
   Alert,
-  ToggleButtonGroup,
-  ToggleButton,
   Divider,
   CircularProgress,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import {
-  createCasa,
-  createDepartamento,
-  createTerreno,
+  getCasaById,
+  getDepartamentoById,
+  getTerrenoById,
+  updateCasa,
+  updateDepartamento,
+  updateTerreno,
   type CasaDTO,
   type DepartamentoDTO,
   type TerrenoDTO,
@@ -32,9 +33,8 @@ import {
   type Amenity,
   type Disposicion,
   type Perimetro,
+  type TipoProp,
 } from '../services/propiedadesService';
-
-type TipoForm = 'casa' | 'departamento' | 'terreno';
 
 const ESTADOS: EstadoPropiedad[] = ['disponible', 'alquilado', 'reservado', 'fuera_de_servicio'];
 const ESTADO_LABEL: Record<EstadoPropiedad, string> = {
@@ -47,9 +47,11 @@ const AMENITIES: Amenity[] = ['PILETA', 'GYM', 'SUM', 'PARRILLA', 'SEGURIDAD_24H
 const DISPOSICIONES: Disposicion[] = ['FRENTE', 'CONTRAFRENTE', 'LATERAL', 'INTERNO'];
 const PERIMETROS: Perimetro[] = ['ALAMBRADO', 'CERCADO', 'SIN_CIERRE'];
 
-export default function NuevoInmueblePage() {
+export default function EditarInmueblePage() {
   const navigate = useNavigate();
-  const [tipo, setTipo] = useState<TipoForm>('casa');
+  const { tipo, id } = useParams<{ tipo: TipoProp; id: string }>();
+
+  const [loadingData, setLoadingData] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function NuevoInmueblePage() {
   const [provincia, setProvincia] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
 
-  // Unidad habitacional
+  // Habitacional
   const [ambientesNum, setAmbientesNum] = useState('');
   const [dormitoriosNum, setDormitoriosNum] = useState('');
   const [baniosNum, setBaniosNum] = useState('');
@@ -94,26 +96,95 @@ export default function NuevoInmueblePage() {
   const [superficieProduccion, setSuperficieProduccion] = useState('');
   const [perimetro, setPerimetro] = useState<Perimetro | ''>('');
 
+  useEffect(() => {
+    if (!tipo || !id) return;
+    const numId = Number(id);
+
+    const cargar = async () => {
+      setLoadingData(true);
+      try {
+        if (tipo === 'casa') {
+          const data = await getCasaById(numId);
+          setCodigoRef(data.codigoRef ?? '');
+          setCodigoCatastral(data.codigoCatastral ?? '');
+          setEstado(data.estado);
+          setSuperficieTotal(data.superficieTotal?.toString() ?? '');
+          setSuperficieCubierta(data.superficieCubierta?.toString() ?? '');
+          setCalleRuta(data.direccion?.calleRuta ?? '');
+          setAlturaKm(data.direccion?.alturaKm ?? '');
+          setLocalidad(data.direccion?.localidad ?? '');
+          setProvincia(data.direccion?.provincia ?? '');
+          setCodigoPostal(data.direccion?.codigoPostal ?? '');
+          setAmbientesNum(data.ambientesNum?.toString() ?? '');
+          setDormitoriosNum(data.dormitoriosNum?.toString() ?? '');
+          setBaniosNum(data.baniosNum?.toString() ?? '');
+          setMascotas(data.mascotas ?? false);
+          setAptoProfesional(data.aptoProfesional ?? false);
+          setAnioConstruccion(data.anioConstruccion?.toString() ?? '');
+          setPlantasNum(data.plantasNum?.toString() ?? '');
+          setJardin(data.jardin ?? false);
+          setCochera(data.cochera ?? false);
+          setBarrioCerrado(data.barrioCerrado ?? false);
+        } else if (tipo === 'departamento') {
+          const data = await getDepartamentoById(numId);
+          setCodigoRef(data.codigoRef ?? '');
+          setCodigoCatastral(data.codigoCatastral ?? '');
+          setEstado(data.estado);
+          setSuperficieTotal(data.superficieTotal?.toString() ?? '');
+          setCalleRuta(data.direccion?.calleRuta ?? '');
+          setAlturaKm(data.direccion?.alturaKm ?? '');
+          setLocalidad(data.direccion?.localidad ?? '');
+          setProvincia(data.direccion?.provincia ?? '');
+          setCodigoPostal(data.direccion?.codigoPostal ?? '');
+          setAmbientesNum(data.ambientesNum?.toString() ?? '');
+          setDormitoriosNum(data.dormitoriosNum?.toString() ?? '');
+          setBaniosNum(data.baniosNum?.toString() ?? '');
+          setMascotas(data.mascotas ?? false);
+          setAptoProfesional(data.aptoProfesional ?? false);
+          setAnioConstruccion(data.anioConstruccion?.toString() ?? '');
+          setPiso(data.piso ?? '');
+          setLetraNumero(data.letraNumero ?? '');
+          setExpensasMonto(data.expensasMonto?.toString() ?? '');
+          setDisposicion(data.disposicion ?? '');
+          setAmenities(data.amenities ?? []);
+        } else {
+          const data = await getTerrenoById(numId);
+          setCodigoRef(data.codigoRef ?? '');
+          setCodigoCatastral(data.codigoCatastral ?? '');
+          setEstado(data.estado);
+          setSuperficieTotal(data.superficieTotal?.toString() ?? '');
+          setCalleRuta(data.direccion?.calleRuta ?? '');
+          setAlturaKm(data.direccion?.alturaKm ?? '');
+          setLocalidad(data.direccion?.localidad ?? '');
+          setProvincia(data.direccion?.provincia ?? '');
+          setCodigoPostal(data.direccion?.codigoPostal ?? '');
+          setAplicaRendimiento(data.aplicaRendimiento ?? false);
+          setSuperficieProduccion(data.superficieProduccion?.toString() ?? '');
+          setPerimetro(data.perimetro ?? '');
+        }
+      } catch {
+        setError('No se pudo cargar el inmueble.');
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    cargar();
+  }, [tipo, id]);
+
   const toggleAmenity = (a: Amenity) =>
     setAmenities((prev) =>
       prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
     );
 
-  const buildDireccion = () => ({
-    calleRuta,
-    ...(alturaKm && { alturaKm }),
-    localidad,
-    provincia,
-    ...(codigoPostal && { codigoPostal }),
-  });
-
   const handleSubmit = async () => {
     if (!codigoRef || !estado || !calleRuta || !localidad || !provincia) {
-      setError('Completá los campos obligatorios: Código Ref, Estado y Dirección.');
+      setError('Completá los campos obligatorios.');
       return;
     }
     setSaving(true);
     setError(null);
+    const numId = Number(id);
+
     try {
       const base = {
         codigoRef,
@@ -121,7 +192,13 @@ export default function NuevoInmueblePage() {
         ...(codigoCatastral && { codigoCatastral }),
         ...(superficieTotal && { superficieTotal: Number(superficieTotal) }),
         ...(superficieCubierta && { superficieCubierta: Number(superficieCubierta) }),
-        direccion: buildDireccion(),
+        direccion: {
+          calleRuta,
+          ...(alturaKm && { alturaKm }),
+          localidad,
+          provincia,
+          ...(codigoPostal && { codigoPostal }),
+        },
       };
 
       const habitacional = {
@@ -142,7 +219,7 @@ export default function NuevoInmueblePage() {
           cochera,
           barrioCerrado,
         };
-        await createCasa(dto);
+        await updateCasa(numId, dto);
       } else if (tipo === 'departamento') {
         const dto: DepartamentoDTO = {
           ...habitacional,
@@ -152,7 +229,7 @@ export default function NuevoInmueblePage() {
           ...(disposicion && { disposicion }),
           amenities,
         };
-        await createDepartamento(dto);
+        await updateDepartamento(numId, dto);
       } else {
         const dto: TerrenoDTO = {
           ...base,
@@ -160,17 +237,25 @@ export default function NuevoInmueblePage() {
           ...(superficieProduccion && { superficieProduccion: Number(superficieProduccion) }),
           ...(perimetro && { perimetro }),
         };
-        await createTerreno(dto);
+        await updateTerreno(numId, dto);
       }
 
       setSuccess(true);
       setTimeout(() => navigate('/inmuebles'), 1500);
     } catch {
-      setError('Error al guardar el inmueble. Verificá la conexión con el backend.');
+      setError('Error al guardar los cambios.');
     } finally {
       setSaving(false);
     }
   };
+
+  if (loadingData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -179,34 +264,14 @@ export default function NuevoInmueblePage() {
           Volver
         </Button>
         <Typography variant="h4" component="h1" color="text.primary">
-          Nuevo Inmueble
+          Editar {tipo ? tipo.charAt(0).toUpperCase() + tipo.slice(1) : 'Inmueble'}
         </Typography>
       </Box>
-
-      {/* Selector de tipo */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            Tipo de inmueble
-          </Typography>
-          <ToggleButtonGroup
-            value={tipo}
-            exclusive
-            onChange={(_, val) => val && setTipo(val)}
-          >
-            <ToggleButton value="casa">Casa</ToggleButton>
-            <ToggleButton value="departamento">Departamento</ToggleButton>
-            <ToggleButton value="terreno">Terreno</ToggleButton>
-          </ToggleButtonGroup>
-        </CardContent>
-      </Card>
 
       {/* Datos básicos */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            Datos básicos
-          </Typography>
+          <Typography variant="subtitle1" fontWeight={600} gutterBottom>Datos básicos</Typography>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
             <TextField label="Código de referencia *" value={codigoRef} onChange={(e) => setCodigoRef(e.target.value)} />
             <TextField label="Código catastral" value={codigoCatastral} onChange={(e) => setCodigoCatastral(e.target.value)} />
@@ -225,9 +290,7 @@ export default function NuevoInmueblePage() {
       {/* Dirección */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            Dirección
-          </Typography>
+          <Typography variant="subtitle1" fontWeight={600} gutterBottom>Dirección</Typography>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
             <TextField label="Calle / Ruta *" value={calleRuta} onChange={(e) => setCalleRuta(e.target.value)} />
             <TextField label="Altura / Km" value={alturaKm} onChange={(e) => setAlturaKm(e.target.value)} />
@@ -238,13 +301,11 @@ export default function NuevoInmueblePage() {
         </CardContent>
       </Card>
 
-      {/* Casa o Departamento */}
+      {/* Habitacional */}
       {(tipo === 'casa' || tipo === 'departamento') && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-              Datos habitacionales
-            </Typography>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>Datos habitacionales</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
               <TextField label="Ambientes" type="number" value={ambientesNum} onChange={(e) => setAmbientesNum(e.target.value)} />
               <TextField label="Dormitorios" type="number" value={dormitoriosNum} onChange={(e) => setDormitoriosNum(e.target.value)} />
@@ -259,13 +320,10 @@ export default function NuevoInmueblePage() {
         </Card>
       )}
 
-      {/* Solo Casa */}
       {tipo === 'casa' && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-              Características de la casa
-            </Typography>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>Características de la casa</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 2 }}>
               <TextField label="Plantas" type="number" value={plantasNum} onChange={(e) => setPlantasNum(e.target.value)} />
             </Box>
@@ -278,13 +336,10 @@ export default function NuevoInmueblePage() {
         </Card>
       )}
 
-      {/* Solo Departamento */}
       {tipo === 'departamento' && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-              Características del departamento
-            </Typography>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>Características del departamento</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 2 }}>
               <TextField label="Piso" value={piso} onChange={(e) => setPiso(e.target.value)} />
               <TextField label="Letra / Número" value={letraNumero} onChange={(e) => setLetraNumero(e.target.value)} />
@@ -301,24 +356,17 @@ export default function NuevoInmueblePage() {
             <Typography variant="body2" fontWeight={600} gutterBottom>Amenities</Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {AMENITIES.map((a) => (
-                <FormControlLabel
-                  key={a}
-                  control={<Checkbox checked={amenities.includes(a)} onChange={() => toggleAmenity(a)} />}
-                  label={a}
-                />
+                <FormControlLabel key={a} control={<Checkbox checked={amenities.includes(a)} onChange={() => toggleAmenity(a)} />} label={a} />
               ))}
             </Box>
           </CardContent>
         </Card>
       )}
 
-      {/* Solo Terreno */}
       {tipo === 'terreno' && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-              Características del terreno
-            </Typography>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>Características del terreno</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 2 }}>
               <TextField label="Superficie de producción (m²)" type="number" value={superficieProduccion} onChange={(e) => setSuperficieProduccion(e.target.value)} />
               <FormControl>
@@ -329,10 +377,7 @@ export default function NuevoInmueblePage() {
                 </Select>
               </FormControl>
             </Box>
-            <FormControlLabel
-              control={<Checkbox checked={aplicaRendimiento} onChange={(e) => setAplicaRendimiento(e.target.checked)} />}
-              label="Aplica rendimiento"
-            />
+            <FormControlLabel control={<Checkbox checked={aplicaRendimiento} onChange={(e) => setAplicaRendimiento(e.target.checked)} />} label="Aplica rendimiento" />
           </CardContent>
         </Card>
       )}
@@ -340,16 +385,14 @@ export default function NuevoInmueblePage() {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button variant="outlined" onClick={() => navigate('/inmuebles')} disabled={saving}>
-          Cancelar
-        </Button>
+        <Button variant="outlined" onClick={() => navigate('/inmuebles')} disabled={saving}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={saving} startIcon={saving ? <CircularProgress size={18} /> : undefined}>
-          {saving ? 'Guardando...' : 'Guardar inmueble'}
+          {saving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
       </Box>
 
       <Snackbar open={success} autoHideDuration={3000}>
-        <Alert severity="success">Inmueble creado correctamente</Alert>
+        <Alert severity="success">Inmueble actualizado correctamente</Alert>
       </Snackbar>
     </Box>
   );

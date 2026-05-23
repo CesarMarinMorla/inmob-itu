@@ -1,11 +1,11 @@
 export interface Telefono {
   numero: string;
-  tipo: 'celular' | 'fijo' | 'trabajo';
+  tipo: 'CELULAR' | 'FIJO' | 'TRABAJO';
 }
 
 export interface Mail {
   email: string;
-  tipo: 'personal' | 'laboral';
+  tipo: 'PERSONAL' | 'LABORAL';
   esPrincipal: boolean;
 }
 
@@ -18,7 +18,7 @@ export interface Direccion {
   localidad: string;
   provincia: string;
   codigoPostal?: string;
-  tipoDomicilio: 'legal' | 'particular' | 'comercial';
+  tipoDomicilio: 'LEGAL' | 'PARTICULAR' | 'COMERCIAL';
 }
 
 export interface PersonaFisica {
@@ -27,7 +27,7 @@ export interface PersonaFisica {
   segundoNombre?: string;
   primerApellido: string;
   segundoApellido?: string;
-  tipoDocumento: 'dni' | 'cuit' | 'cuil' | 'pasaporte';
+  tipoDocumento: 'DNI' | 'CUIT' | 'CUIL' | 'PASAPORTE';
   numDocumento: string;
   fechaNacimiento: string;
   telefonos: Telefono[];
