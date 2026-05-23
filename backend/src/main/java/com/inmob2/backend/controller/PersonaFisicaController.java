@@ -1,14 +1,15 @@
 package com.inmob2.backend.controller;
 
 import com.inmob2.backend.model.dto.PersonaFisicaDTO;
+import com.inmob2.backend.model.response.PageResponse;
 import com.inmob2.backend.service.PersonaFisicaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/personas-fisicas")
@@ -18,12 +19,15 @@ public class PersonaFisicaController {
     private final PersonaFisicaService personaFisicaService;
 
     @GetMapping
-    public ResponseEntity<List<PersonaFisicaDTO>> listarTodas(
-            @RequestParam(required = false) String rol) {
-        List<PersonaFisicaDTO> resultado = (rol != null && !rol.isBlank())
-                ? personaFisicaService.obtenerPorRol(rol)
-                : personaFisicaService.obtenerTodas();
-        return ResponseEntity.ok(resultado);
+    public ResponseEntity<PageResponse<PersonaFisicaDTO>> listarTodas(
+            @RequestParam(required = false) String rol,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        var resultado = (rol != null && !rol.isBlank())
+                ? personaFisicaService.obtenerPorRol(rol, pageable)
+                : personaFisicaService.obtenerTodas(pageable);
+        return ResponseEntity.ok(PageResponse.fromPage(resultado));
     }
 
     @GetMapping("/{dni}")
