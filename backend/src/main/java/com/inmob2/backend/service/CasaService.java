@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +19,8 @@ public class CasaService {
     private final PropiedadMapperUtils propiedadMapper;
 
     @Transactional(readOnly = true)
-    public List<CasaDTO> obtenerTodas() {
-        return casaRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<CasaDTO> obtenerTodas(Pageable pageable) {
+        return casaRepository.findAll(pageable).map(this::mapToDto);
     }
 
     @Transactional(readOnly = true)
