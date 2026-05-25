@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { useAuthClient } from '../services/authClient';
 import {
   Box,
   Typography,
@@ -19,6 +20,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import {
   getCasaById,
   getDepartamentoById,
@@ -48,6 +50,7 @@ const DISPOSICIONES: Disposicion[] = ['FRENTE', 'CONTRAFRENTE', 'LATERAL', 'INTE
 const PERIMETROS: Perimetro[] = ['ALAMBRADO', 'CERCADO', 'SIN_CIERRE'];
 
 export default function EditarInmueblePage() {
+  const { fetchWithToken } = useAuthClient();
   const navigate = useNavigate();
   const { tipo, id } = useParams<{ tipo: TipoProp; id: string }>();
 
@@ -104,7 +107,7 @@ export default function EditarInmueblePage() {
       setLoadingData(true);
       try {
         if (tipo === 'casa') {
-          const data = await getCasaById(numId);
+          const data = await getCasaById(fetchWithToken, numId);
           setCodigoRef(data.codigoRef ?? '');
           setCodigoCatastral(data.codigoCatastral ?? '');
           setEstado(data.estado);
@@ -126,7 +129,7 @@ export default function EditarInmueblePage() {
           setCochera(data.cochera ?? false);
           setBarrioCerrado(data.barrioCerrado ?? false);
         } else if (tipo === 'departamento') {
-          const data = await getDepartamentoById(numId);
+          const data = await getDepartamentoById(fetchWithToken, numId);
           setCodigoRef(data.codigoRef ?? '');
           setCodigoCatastral(data.codigoCatastral ?? '');
           setEstado(data.estado);
@@ -148,7 +151,7 @@ export default function EditarInmueblePage() {
           setDisposicion(data.disposicion ?? '');
           setAmenities(data.amenities ?? []);
         } else {
-          const data = await getTerrenoById(numId);
+          const data = await getTerrenoById(fetchWithToken, numId);
           setCodigoRef(data.codigoRef ?? '');
           setCodigoCatastral(data.codigoCatastral ?? '');
           setEstado(data.estado);
@@ -219,7 +222,7 @@ export default function EditarInmueblePage() {
           cochera,
           barrioCerrado,
         };
-        await updateCasa(numId, dto);
+        await updateCasa(fetchWithToken, numId, dto);
       } else if (tipo === 'departamento') {
         const dto: DepartamentoDTO = {
           ...habitacional,
@@ -229,7 +232,7 @@ export default function EditarInmueblePage() {
           ...(disposicion && { disposicion }),
           amenities,
         };
-        await updateDepartamento(numId, dto);
+        await updateDepartamento(fetchWithToken, numId, dto);
       } else {
         const dto: TerrenoDTO = {
           ...base,
@@ -237,7 +240,7 @@ export default function EditarInmueblePage() {
           ...(superficieProduccion && { superficieProduccion: Number(superficieProduccion) }),
           ...(perimetro && { perimetro }),
         };
-        await updateTerreno(numId, dto);
+        await updateTerreno(fetchWithToken, numId, dto);
       }
 
       setSuccess(true);

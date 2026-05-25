@@ -3,7 +3,7 @@ import { Box, Button, Container, Typography, Paper } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 
-export function LoginPage() {
+export default function LoginPage() {
   const { loginWithRedirect } = useAuth0();
 
   return (
@@ -18,6 +18,7 @@ export function LoginPage() {
         overflow: "hidden",
       }}
     >
+      {/* Elementos decorativos de fondo */}
       <Box
         sx={{
           position: "absolute",
@@ -99,7 +100,11 @@ export function LoginPage() {
             color="primary"
             size="large"
             startIcon={<LockOutlinedIcon />}
-            onClick={() => loginWithRedirect()}
+            onClick={() => loginWithRedirect({
+              authorizationParams: {
+                audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+              }
+            })}
             sx={{
               py: 1.5,
               fontSize: "1.1rem",
@@ -129,5 +134,3 @@ export function LoginPage() {
     </Box>
   );
 }
-
-export default LoginPage;

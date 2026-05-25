@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080/api/v1';
+type FetchFn = (endpoint: string, options?: RequestInit) => Promise<Response>;
 
 // ── ENUMS ─────────────────────────────────────────────────────────────────────
 export type EstadoPropiedad = 'disponible' | 'alquilado' | 'reservado' | 'fuera_de_servicio';
@@ -63,100 +63,73 @@ export interface PropiedadConTipo extends PropiedadDTO {
   tipoProp: TipoProp;
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
-  return res.json();
-}
-
 // ── CASAS ─────────────────────────────────────────────────────────────────────
-export const getCasas = (): Promise<CasaDTO[]> =>
-  fetch(`${BASE_URL}/casas`).then(handleResponse);
+export const getCasas = (fetchWithToken: FetchFn): Promise<CasaDTO[]> =>
+  fetchWithToken('/casas').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const getCasaById = (id: number): Promise<CasaDTO> =>
-  fetch(`${BASE_URL}/casas/${id}`).then(handleResponse);
+export const getCasaById = (fetchWithToken: FetchFn, id: number): Promise<CasaDTO> =>
+  fetchWithToken(`/casas/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const createCasa = (dto: CasaDTO): Promise<CasaDTO> =>
-  fetch(`${BASE_URL}/casas`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const createCasa = (fetchWithToken: FetchFn, dto: CasaDTO): Promise<CasaDTO> =>
+  fetchWithToken('/casas', { method: 'POST', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const updateCasa = (id: number, dto: CasaDTO): Promise<CasaDTO> =>
-  fetch(`${BASE_URL}/casas/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const updateCasa = (fetchWithToken: FetchFn, id: number, dto: CasaDTO): Promise<CasaDTO> =>
+  fetchWithToken(`/casas/${id}`, { method: 'PUT', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const deleteCasa = (id: number): Promise<void> =>
-  fetch(`${BASE_URL}/casas/${id}`, { method: 'DELETE' }).then((res) => {
-    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
-  });
+export const deleteCasa = (fetchWithToken: FetchFn, id: number): Promise<void> =>
+  fetchWithToken(`/casas/${id}`, { method: 'DELETE' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); });
 
 // ── DEPARTAMENTOS ─────────────────────────────────────────────────────────────
-export const getDepartamentos = (): Promise<DepartamentoDTO[]> =>
-  fetch(`${BASE_URL}/departamentos`).then(handleResponse);
+export const getDepartamentos = (fetchWithToken: FetchFn): Promise<DepartamentoDTO[]> =>
+  fetchWithToken('/departamentos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const getDepartamentoById = (id: number): Promise<DepartamentoDTO> =>
-  fetch(`${BASE_URL}/departamentos/${id}`).then(handleResponse);
+export const getDepartamentoById = (fetchWithToken: FetchFn, id: number): Promise<DepartamentoDTO> =>
+  fetchWithToken(`/departamentos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const createDepartamento = (dto: DepartamentoDTO): Promise<DepartamentoDTO> =>
-  fetch(`${BASE_URL}/departamentos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const createDepartamento = (fetchWithToken: FetchFn, dto: DepartamentoDTO): Promise<DepartamentoDTO> =>
+  fetchWithToken('/departamentos', { method: 'POST', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const updateDepartamento = (id: number, dto: DepartamentoDTO): Promise<DepartamentoDTO> =>
-  fetch(`${BASE_URL}/departamentos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const updateDepartamento = (fetchWithToken: FetchFn, id: number, dto: DepartamentoDTO): Promise<DepartamentoDTO> =>
+  fetchWithToken(`/departamentos/${id}`, { method: 'PUT', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const deleteDepartamento = (id: number): Promise<void> =>
-  fetch(`${BASE_URL}/departamentos/${id}`, { method: 'DELETE' }).then((res) => {
-    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
-  });
+export const deleteDepartamento = (fetchWithToken: FetchFn, id: number): Promise<void> =>
+  fetchWithToken(`/departamentos/${id}`, { method: 'DELETE' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); });
 
 // ── TERRENOS ──────────────────────────────────────────────────────────────────
-export const getTerrenos = (): Promise<TerrenoDTO[]> =>
-  fetch(`${BASE_URL}/terrenos`).then(handleResponse);
+export const getTerrenos = (fetchWithToken: FetchFn): Promise<TerrenoDTO[]> =>
+  fetchWithToken('/terrenos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const getTerrenoById = (id: number): Promise<TerrenoDTO> =>
-  fetch(`${BASE_URL}/terrenos/${id}`).then(handleResponse);
+export const getTerrenoById = (fetchWithToken: FetchFn, id: number): Promise<TerrenoDTO> =>
+  fetchWithToken(`/terrenos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const createTerreno = (dto: TerrenoDTO): Promise<TerrenoDTO> =>
-  fetch(`${BASE_URL}/terrenos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const createTerreno = (fetchWithToken: FetchFn, dto: TerrenoDTO): Promise<TerrenoDTO> =>
+  fetchWithToken('/terrenos', { method: 'POST', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const updateTerreno = (id: number, dto: TerrenoDTO): Promise<TerrenoDTO> =>
-  fetch(`${BASE_URL}/terrenos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const updateTerreno = (fetchWithToken: FetchFn, id: number, dto: TerrenoDTO): Promise<TerrenoDTO> =>
+  fetchWithToken(`/terrenos/${id}`, { method: 'PUT', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const deleteTerreno = (id: number): Promise<void> =>
-  fetch(`${BASE_URL}/terrenos/${id}`, { method: 'DELETE' }).then((res) => {
-    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
-  });
+export const deleteTerreno = (fetchWithToken: FetchFn, id: number): Promise<void> =>
+  fetchWithToken(`/terrenos/${id}`, { method: 'DELETE' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); });
 
 // ── UNIFICADO ─────────────────────────────────────────────────────────────────
-export const getAllPropiedades = async (): Promise<PropiedadConTipo[]> => {
+export const getAllPropiedades = async (fetchWithToken: FetchFn): Promise<PropiedadConTipo[]> => {
   const [casas, departamentos, terrenos] = await Promise.all([
-    getCasas(),
-    getDepartamentos(),
-    getTerrenos(),
+    getCasas(fetchWithToken),
+    getDepartamentos(fetchWithToken),
+    getTerrenos(fetchWithToken),
   ]);
   return [
-    ...casas.map((c) => ({ ...c, tipoProp: 'casa' as TipoProp })),
-    ...departamentos.map((d) => ({ ...d, tipoProp: 'departamento' as TipoProp })),
-    ...terrenos.map((t) => ({ ...t, tipoProp: 'terreno' as TipoProp })),
+    ...casas.map(c => ({ ...c, tipoProp: 'casa' as TipoProp })),
+    ...departamentos.map(d => ({ ...d, tipoProp: 'departamento' as TipoProp })),
+    ...terrenos.map(t => ({ ...t, tipoProp: 'terreno' as TipoProp })),
   ];
 };

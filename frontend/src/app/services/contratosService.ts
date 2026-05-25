@@ -1,11 +1,9 @@
-const BASE_URL = 'http://localhost:8080/api/v1';
+type FetchFn = (endpoint: string, options?: RequestInit) => Promise<Response>;
 
-// ── ENUMS ─────────────────────────────────────────────────────────────────────
 export type EstadoContrato = 'BORRADOR' | 'VIGENTE' | 'FINALIZADO' | 'EN_MORA';
 export type IndiceAjuste = 'ICL' | 'IPC';
 export type TipoMoneda = 'ARS' | 'USD';
 
-// ── DTO ───────────────────────────────────────────────────────────────────────
 export interface ContratoDTO {
   id?: number;
   contratoNumero: string;
@@ -31,34 +29,20 @@ export interface ContratoDTO {
   garantesIds?: number[];
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
-  return res.json();
-}
+export const getContratos = (fetchWithToken: FetchFn): Promise<ContratoDTO[]> =>
+  fetchWithToken('/contratos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-// ── CRUD ──────────────────────────────────────────────────────────────────────
-export const getContratos = (): Promise<ContratoDTO[]> =>
-  fetch(`${BASE_URL}/contratos`).then(handleResponse);
+export const getContratoById = (fetchWithToken: FetchFn, id: number): Promise<ContratoDTO> =>
+  fetchWithToken(`/contratos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const getContratoById = (id: number): Promise<ContratoDTO> =>
-  fetch(`${BASE_URL}/contratos/${id}`).then(handleResponse);
+export const createContrato = (fetchWithToken: FetchFn, dto: ContratoDTO): Promise<ContratoDTO> =>
+  fetchWithToken('/contratos', { method: 'POST', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const createContrato = (dto: ContratoDTO): Promise<ContratoDTO> =>
-  fetch(`${BASE_URL}/contratos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
+export const updateContrato = (fetchWithToken: FetchFn, id: number, dto: ContratoDTO): Promise<ContratoDTO> =>
+  fetchWithToken(`/contratos/${id}`, { method: 'PUT', body: JSON.stringify(dto) })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
 
-export const updateContrato = (id: number, dto: ContratoDTO): Promise<ContratoDTO> =>
-  fetch(`${BASE_URL}/contratos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  }).then(handleResponse);
-
-export const deleteContrato = (id: number): Promise<void> =>
-  fetch(`${BASE_URL}/contratos/${id}`, { method: 'DELETE' }).then((res) => {
-    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
-  });
+export const deleteContrato = (fetchWithToken: FetchFn, id: number): Promise<void> =>
+  fetchWithToken(`/contratos/${id}`, { method: 'DELETE' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); });

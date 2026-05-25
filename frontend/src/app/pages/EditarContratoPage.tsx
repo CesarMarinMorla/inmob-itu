@@ -22,6 +22,7 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { ArrowBack, ExpandMore } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import { getContratoById, updateContrato, type ContratoDTO, type EstadoContrato, type TipoMoneda, type IndiceAjuste } from '../services/contratosService';
 import { getAllPropiedades, type PropiedadConTipo } from '../services/propiedadesService';
 import { getPersonasFisicas, getPersonasJuridicas, type PersonaFisica, type PersonaJuridica } from '../services/personasService';
@@ -37,6 +38,7 @@ const toOpciones = (personas: (PersonaFisica | PersonaJuridica)[]): PersonaOpcio
   }));
 
 export default function EditarContratoPage() {
+  const { fetchWithToken } = useAuthClient();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
@@ -73,10 +75,10 @@ export default function EditarContratoPage() {
   useEffect(() => {
     if (!id) return;
     Promise.all([
-      getContratoById(Number(id)),
-      getAllPropiedades(),
-      getPersonasFisicas(),
-      getPersonasJuridicas(),
+      getContratoById(fetchWithToken, Number(id)),
+      getAllPropiedades(fetchWithToken),
+      getPersonasFisicas(fetchWithToken),
+      getPersonasJuridicas(fetchWithToken),
     ]).then(([contrato, props, fisicas, juridicas]) => {
       const opciones = [...toOpciones(fisicas), ...toOpciones(juridicas)];
       setPropiedades(props);
@@ -137,7 +139,7 @@ export default function EditarContratoPage() {
         aplicaProdCarne,
         ...(cantidadCarne && { cantidadCarne: Number(cantidadCarne) }),
       };
-      await updateContrato(Number(id), dto);
+      await updateContrato(fetchWithToken, Number(id), dto);
       setSuccess(true);
       setTimeout(() => navigate('/contratos'), 1500);
     } catch {

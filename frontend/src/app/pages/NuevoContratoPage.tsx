@@ -22,6 +22,7 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { ArrowBack, ExpandMore } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import { createContrato, type ContratoDTO, type EstadoContrato, type TipoMoneda, type IndiceAjuste } from '../services/contratosService';
 import { getAllPropiedades, type PropiedadConTipo } from '../services/propiedadesService';
 import { getPersonasFisicas, getPersonasJuridicas, type PersonaFisica, type PersonaJuridica } from '../services/personasService';
@@ -39,6 +40,7 @@ const toOpciones = (personas: (PersonaFisica | PersonaJuridica)[]): PersonaOpcio
     }));
 
 export default function NuevoContratoPage() {
+  const { fetchWithToken } = useAuthClient();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -76,9 +78,9 @@ export default function NuevoContratoPage() {
 
   useEffect(() => {
     Promise.all([
-      getAllPropiedades(),
-      getPersonasFisicas(),
-      getPersonasJuridicas(),
+      getAllPropiedades(fetchWithToken),
+      getPersonasFisicas(fetchWithToken),
+      getPersonasJuridicas(fetchWithToken),
     ]).then(([props, fisicas, juridicas]) => {
       setPropiedades(props);
       setPersonasOpciones([...toOpciones(fisicas), ...toOpciones(juridicas)]);
@@ -120,7 +122,7 @@ export default function NuevoContratoPage() {
         aplicaProdCarne,
         ...(cantidadCarne && { cantidadCarne: Number(cantidadCarne) }),
       };
-      await createContrato(dto);
+      await createContrato(fetchWithToken, dto);
       setSuccess(true);
       setTimeout(() => navigate('/contratos'), 1500);
     } catch {
