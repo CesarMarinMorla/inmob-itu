@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useAuthClient } from '../services/authClient';
 import {
   Box,
   Typography,
