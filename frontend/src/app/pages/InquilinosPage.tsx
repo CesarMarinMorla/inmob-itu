@@ -20,9 +20,11 @@ import {
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
 import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica, getPersonasJuridicas, deletePersonaJuridica, type PersonaJuridica } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 
 export default function InquilinosPage() {
   const navigate = useNavigate();
+  const { fetchWithToken } = useAuthClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [inquilinos, setInquilinos] = useState<(PersonaFisica | PersonaJuridica)[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -36,11 +38,11 @@ export default function InquilinosPage() {
 
   useEffect(() => {
     loadInquilinos();
-  }, []);
+  }, [fetchWithToken]);
 
   const loadInquilinos = async () => {
-    const dataFisicas = await getPersonasFisicas('inquilino');
-    const dataJuridicas = await getPersonasJuridicas('inquilino');
+    const dataFisicas = await getPersonasFisicas(fetchWithToken, 'inquilino');
+    const dataJuridicas = await getPersonasJuridicas(fetchWithToken, 'inquilino');
     setInquilinos([...dataFisicas, ...dataJuridicas]);
   };
 
@@ -79,9 +81,9 @@ export default function InquilinosPage() {
 
     let success = false;
     if (deleteTipo === 'fisica') {
-      success = await deletePersonaFisica(selectedId.toString());
+      success = await deletePersonaFisica(fetchWithToken, selectedId.toString());
     } else {
-      success = await deletePersonaJuridica(selectedId.toString());
+      success = await deletePersonaJuridica(fetchWithToken, selectedId.toString());
     }
     if (success) {
       setSnackbar({ open: true, message: 'Inquilino eliminado exitosamente', severity: 'success' });

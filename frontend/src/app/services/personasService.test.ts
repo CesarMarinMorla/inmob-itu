@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as personasService from './personasService';
 
 // Mock data
@@ -25,39 +25,33 @@ const mockPersonaJuridica: personasService.PersonaJuridica = {
 };
 
 describe('Personas Service', () => {
+  let mockFetchWithToken: any;
+
   beforeEach(() => {
-    // Reset any previous mocks
-    vi.clearAllMocks();
-
-    // Mock global fetch
-    global.fetch = vi.fn();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    mockFetchWithToken = vi.fn();
   });
 
   describe('Personas Físicas', () => {
     it('getPersonasFisicas should fetch and return data correctly', async () => {
       const mockData = [mockPersonaFisica];
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasFisicas();
+      const result = await personasService.getPersonasFisicas(mockFetchWithToken);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas');
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-fisicas');
+      expect(mockFetchWithToken).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
     });
 
     it('getPersonasFisicas should handle errors and return empty array', async () => {
-      (global.fetch as any).mockRejectedValue(new Error('Network error'));
+      mockFetchWithToken.mockRejectedValue(new Error('Network error'));
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
-      const result = await personasService.getPersonasFisicas();
+      const result = await personasService.getPersonasFisicas(mockFetchWithToken);
 
       expect(result).toEqual([]);
       expect(consoleSpy).toHaveBeenCalled();
@@ -65,67 +59,65 @@ describe('Personas Service', () => {
     });
 
     it('createPersonaFisica should send correct POST request', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.createPersonaFisica(mockPersonaFisica);
+      const result = await personasService.createPersonaFisica(mockFetchWithToken, mockPersonaFisica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-fisicas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaFisica)
       });
       expect(result).toEqual(mockPersonaFisica);
     });
 
     it('getPersonaFisicaByDni should return data if DNI exist', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.getPersonaFisicaByDni('12345678');
+      const result = await personasService.getPersonaFisicaByDni(mockFetchWithToken, '12345678');
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/12345678');
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-fisicas/12345678');
       expect(result).toEqual(mockPersonaFisica);
     });
 
     it('getPersonaFisicaByDni should return null if status 404', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: false,
         status: 404
       });
 
-      const result = await personasService.getPersonaFisicaByDni('000');
+      const result = await personasService.getPersonaFisicaByDni(mockFetchWithToken, '000');
       expect(result).toBeNull();
     });
 
     it('updatePersonaFisica should send correct PUT request', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockPersonaFisica
       });
 
-      const result = await personasService.updatePersonaFisica(1, mockPersonaFisica);
+      const result = await personasService.updatePersonaFisica(mockFetchWithToken, 1, mockPersonaFisica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-fisicas/1', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaFisica)
       });
       expect(result).toEqual(mockPersonaFisica);
     });
 
     it('deletePersonaFisica should send DELETE request and return true', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true
       });
 
-      const result = await personasService.deletePersonaFisica(1);
+      const result = await personasService.deletePersonaFisica(mockFetchWithToken, 1);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-fisicas/1', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-fisicas/1', {
         method: 'DELETE'
       });
       expect(result).toBe(true);
@@ -135,81 +127,79 @@ describe('Personas Service', () => {
   describe('Personas Jurídicas', () => {
     it('getPersonasJuridicas should fetch and return data correctly', async () => {
       const mockData = [mockPersonaJuridica];
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasJuridicas();
+      const result = await personasService.getPersonasJuridicas(mockFetchWithToken);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas');
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-juridicas');
+      expect(mockFetchWithToken).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockData);
     });
 
     it('getPersonasJuridicas should append rol parameter if provided', async () => {
       const mockData = [mockPersonaJuridica];
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockData
       });
 
-      const result = await personasService.getPersonasJuridicas('propietario');
+      const result = await personasService.getPersonasJuridicas(mockFetchWithToken, 'propietario');
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas?rol=propietario');
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-juridicas?rol=propietario');
       expect(result).toEqual(mockData);
     });
 
     it('createPersonaJuridica should send correct POST request', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockPersonaJuridica
       });
 
-      const result = await personasService.createPersonaJuridica(mockPersonaJuridica);
+      const result = await personasService.createPersonaJuridica(mockFetchWithToken, mockPersonaJuridica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-juridicas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaJuridica)
       });
       expect(result).toEqual(mockPersonaJuridica);
     });
 
     it('getPersonaJuridicaByCuit should return null if status 404', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: false,
         status: 404
       });
 
-      const result = await personasService.getPersonaJuridicaByCuit('000');
+      const result = await personasService.getPersonaJuridicaByCuit(mockFetchWithToken, '000');
       expect(result).toBeNull();
     });
 
     it('updatePersonaJuridica should send correct PUT request', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true,
         json: async () => mockPersonaJuridica
       });
 
-      const result = await personasService.updatePersonaJuridica(2, mockPersonaJuridica);
+      const result = await personasService.updatePersonaJuridica(mockFetchWithToken, 2, mockPersonaJuridica);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-juridicas/2', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPersonaJuridica)
       });
       expect(result).toEqual(mockPersonaJuridica);
     });
 
     it('deletePersonaJuridica should send DELETE request and return true', async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetchWithToken.mockResolvedValue({
         ok: true
       });
 
-      const result = await personasService.deletePersonaJuridica(2);
+      const result = await personasService.deletePersonaJuridica(mockFetchWithToken, 2);
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/personas-juridicas/2', {
+      expect(mockFetchWithToken).toHaveBeenCalledWith('/personas-juridicas/2', {
         method: 'DELETE'
       });
       expect(result).toBe(true);

@@ -36,9 +36,9 @@ backend/HELP.md
 # --- Node.js / React (Frontend - keeping for future use) ---
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
+#frontend/.env
+#frontend/.env.local
+#frontend/.env.*.local
 frontend/.vite/
 
 # --- Logs & Temp ---

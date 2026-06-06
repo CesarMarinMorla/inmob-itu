@@ -17,11 +17,11 @@ export interface IndiceDTO {
   tipo: string;
 }
 
-const API_INDICES_URL = 'http://localhost:8080/api/v1/indices';
+type FetchFn = (endpoint: string, options?: RequestInit) => Promise<Response>;
 
-export const getIndicesConsolidados = async (): Promise<IndicesConsolidadosDTO | null> => {
+export const getIndicesConsolidados = async (fetchWithToken: FetchFn): Promise<IndicesConsolidadosDTO | null> => {
   try {
-    const response = await fetch(API_INDICES_URL);
+    const response = await fetchWithToken('/indices');
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
@@ -32,16 +32,16 @@ export const getIndicesConsolidados = async (): Promise<IndicesConsolidadosDTO |
   }
 };
 
-export const getIndices = async (): Promise<IndiceDTO[]> => {
-  const response = await fetch(`${API_INDICES_URL}/lista`);
+export const getIndices = async (fetchWithToken: FetchFn): Promise<IndiceDTO[]> => {
+  const response = await fetchWithToken('/indices/lista');
   if (!response.ok) {
     throw new Error(`Error HTTP: ${response.status}`);
   }
   return await response.json();
 };
 
-export const getUltimosIndices = async (): Promise<IndiceDTO> => {
-  const response = await fetch(`${API_INDICES_URL}/ultimo`);
+export const getUltimosIndices = async (fetchWithToken: FetchFn): Promise<IndiceDTO> => {
+  const response = await fetchWithToken('/indices/ultimo');
   if (!response.ok) {
     throw new Error(`Error HTTP: ${response.status}`);
   }

@@ -30,9 +30,11 @@ import {
   type PersonaJuridica,
   type PropietarioDTO,
 } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 
 export default function NuevoPropietarioPage() {
   const navigate = useNavigate();
+  const { fetchWithToken } = useAuthClient();
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -145,11 +147,11 @@ export default function NuevoPropietarioPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaFisica(personaData);
+      const result = await createPersonaFisica(fetchWithToken, personaData);
       if (result && result.id) {
         // Asignar rol de propietario
         const propietarioData: PropietarioDTO = {};
-        const rolResult = await asignarRolPropietario(Number(result.id), propietarioData);
+        const rolResult = await asignarRolPropietario(fetchWithToken, Number(result.id), propietarioData);
         if (rolResult) {
           setSnackbar({ open: true, message: 'Propietario creado exitosamente', severity: 'success' });
           setTimeout(() => navigate('/propietarios'), 1500);
@@ -173,11 +175,11 @@ export default function NuevoPropietarioPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaJuridica(empresaData);
+      const result = await createPersonaJuridica(fetchWithToken, empresaData);
       if (result && result.id) {
         // Asignar rol de propietario
         const propietarioData: PropietarioDTO = {};
-        const rolResult = await asignarRolPropietario(Number(result.id), propietarioData);
+        const rolResult = await asignarRolPropietario(fetchWithToken, Number(result.id), propietarioData);
         if (rolResult) {
           setSnackbar({ open: true, message: 'Empresa creada exitosamente', severity: 'success' });
           setTimeout(() => navigate('/propietarios'), 1500);

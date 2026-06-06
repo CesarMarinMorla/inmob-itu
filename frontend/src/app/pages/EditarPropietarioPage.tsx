@@ -39,6 +39,7 @@ import {
   type Mail,
   type Direccion,
 } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 import {
   getInquilinosByPropietarioId,
   getInquilinos,
@@ -50,6 +51,7 @@ import {
 export default function EditarPropietarioPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { fetchWithToken } = useAuthClient();
   const [loading, setLoading] = useState(true);
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [personaId, setPersonaId] = useState<number | string | null>(null);
@@ -141,10 +143,10 @@ export default function EditarPropietarioPage() {
     const loadPropietario = async () => {
       if (id) {
         let isEmpresa = false;
-        let propietario: any = await getPersonaFisicaByDni(id);
+        let propietario: any = await getPersonaFisicaByDni(fetchWithToken, id);
 
         if (!propietario) {
-          propietario = await getPersonaJuridicaByCuit(id);
+          propietario = await getPersonaJuridicaByCuit(fetchWithToken, id);
           isEmpresa = !!propietario;
         }
 
@@ -195,7 +197,7 @@ export default function EditarPropietarioPage() {
       }
     };
     loadPropietario();
-  }, [id, navigate]);
+  }, [id, navigate, fetchWithToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,7 +248,7 @@ export default function EditarPropietarioPage() {
         numDocumento: numeroDocumento,
         fechaNacimiento,
       };
-      updated = await updatePersonaFisica(personaId, personaData as any);
+      updated = await updatePersonaFisica(fetchWithToken, personaId, personaData as any);
     } else {
       const empresaData = {
         ...commonData,
@@ -255,7 +257,7 @@ export default function EditarPropietarioPage() {
         nombreNegocio,
         fechaConstitucion,
       };
-      updated = await updatePersonaJuridica(personaId, empresaData as any);
+      updated = await updatePersonaJuridica(fetchWithToken, personaId, empresaData as any);
     }
 
     if (updated) {
