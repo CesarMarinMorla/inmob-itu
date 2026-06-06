@@ -8,8 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,15 +24,13 @@ public class PersonaJuridicaService {
     private final PersonaJuridicaRepository personaJuridicaRepository;
 
     @Transactional(readOnly = true)
-    public List<PersonaJuridicaDTO> obtenerTodas() {
-        return personaJuridicaRepository.findAll().stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public Page<PersonaJuridicaDTO> obtenerTodas(Pageable pageable) {
+        return personaJuridicaRepository.findAll(pageable).map(this::convertirADto);
     }
 
     @Transactional(readOnly = true)
-    public List<PersonaJuridicaDTO> obtenerPorRol(String rol) {
-        Map<String, Supplier<List<PersonaJuridica>>> queries = Map.of(
+    public Page<PersonaJuridicaDTO> obtenerPorRol(String rol, Pageable pageable) {
+        Map<String, Function<Pageable, Page<PersonaJuridica>>> queries = Map.of(
                 "inquilino", personaJuridicaRepository::findAllWithRolInquilino,
                 "propietario", personaJuridicaRepository::findAllWithRolPropietario,
                 "garante", personaJuridicaRepository::findAllWithRolGarante,
@@ -36,15 +38,13 @@ public class PersonaJuridicaService {
                 "administrador", personaJuridicaRepository::findAllWithRolAdministrador
         );
 
-        Supplier<List<PersonaJuridica>> query = queries.get(rol.toLowerCase());
+        Function<Pageable, Page<PersonaJuridica>> query = queries.get(rol.toLowerCase());
         if (query == null) {
             throw new IllegalArgumentException(
                 "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
         }
 
-        return query.get().stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+        return query.apply(pageable).map(this::convertirADto);
     }
 
     @Transactional
