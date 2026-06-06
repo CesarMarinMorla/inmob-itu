@@ -39,7 +39,7 @@ public class ContratoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ContratoDTO> actualizarContrato(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody ContratoDTO dto) {
         return ResponseEntity.ok(contratoService.actualizar(id, dto));
     }

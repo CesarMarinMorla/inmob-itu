@@ -39,6 +39,7 @@ import {
   type Mail,
   type Direccion,
 } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 import {
   getPropietariosByInquilinoId,
   getPropietarios,

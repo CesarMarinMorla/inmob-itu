@@ -48,7 +48,7 @@ public class PersonaFisicaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PersonaFisicaDTO> actualizarPersona(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody PersonaFisicaDTO dto) {
         return ResponseEntity.ok(personaFisicaService.actualizar(id, dto));
     }

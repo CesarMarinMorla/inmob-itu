@@ -59,12 +59,12 @@ public class ContratoService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró contrato con ID: " + id));
 
         ContratoMapperUtils.mapToEntity(dto, contrato);
-        
+
         // Limpiamos listas antes de renovarlas
         contrato.getPropietarios().clear();
         contrato.getInquilinos().clear();
         contrato.getGarantes().clear();
-        
+
         vincularRelaciones(contrato, dto);
 
         return convertirADto(contratoRepository.save(contrato));
@@ -89,7 +89,8 @@ public class ContratoService {
     private void vincularRelaciones(Contrato contrato, ContratoDTO dto) {
         // 1. Propiedad
         Propiedad propiedad = propiedadRepository.findById(dto.getPropiedadAlquiladaId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró Propiedad con ID: " + dto.getPropiedadAlquiladaId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se encontró Propiedad con ID: " + dto.getPropiedadAlquiladaId()));
         contrato.setPropiedadAlquilada(propiedad);
 
         // 2. Propietarios

@@ -31,6 +31,7 @@ import {
   type PersonaJuridica,
   type PropietarioDTO,
 } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 
 export default function NuevoPropietarioPage() {
   const navigate = useNavigate();

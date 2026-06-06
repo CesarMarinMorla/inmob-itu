@@ -35,16 +35,35 @@ public class PersonaJuridicaService {
                 "propietario", personaJuridicaRepository::findAllWithRolPropietario,
                 "garante", personaJuridicaRepository::findAllWithRolGarante,
                 "empleado", personaJuridicaRepository::findAllWithRolEmpleado,
-                "administrador", personaJuridicaRepository::findAllWithRolAdministrador
-        );
+                "administrador", personaJuridicaRepository::findAllWithRolAdministrador);
 
         Function<Pageable, Page<PersonaJuridica>> query = queries.get(rol.toLowerCase());
         if (query == null) {
             throw new IllegalArgumentException(
-                "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
+                    "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
         }
 
         return query.apply(pageable).map(this::convertirADto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PersonaJuridicaDTO> obtenerPorRol(String rol) {
+        Map<String, Supplier<List<PersonaJuridica>>> queries = Map.of(
+                "inquilino", personaJuridicaRepository::findAllWithRolInquilino,
+                "propietario", personaJuridicaRepository::findAllWithRolPropietario,
+                "garante", personaJuridicaRepository::findAllWithRolGarante,
+                "empleado", personaJuridicaRepository::findAllWithRolEmpleado,
+                "administrador", personaJuridicaRepository::findAllWithRolAdministrador);
+
+        Supplier<List<PersonaJuridica>> query = queries.get(rol.toLowerCase());
+        if (query == null) {
+            throw new IllegalArgumentException(
+                    "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
+        }
+
+        return query.get().stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -95,13 +114,14 @@ public class PersonaJuridicaService {
         try {
             personaJuridicaRepository.deleteById(id);
         } catch (Exception e) {
-            throw new IllegalStateException("No se puede eliminar la empresa porque tiene registros asociados (ej: contratos, roles o propiedades).");
+            throw new IllegalStateException(
+                    "No se puede eliminar la empresa porque tiene registros asociados (ej: contratos, roles o propiedades).");
         }
     }
 
     private PersonaJuridicaDTO convertirADto(PersonaJuridica entidad) {
         PersonaJuridicaDTO dto = new PersonaJuridicaDTO();
-        
+
         dto.setRazonSocial(entidad.getRazonSocial());
         dto.setCuit(entidad.getCuit());
         dto.setFechaConstitucion(entidad.getFechaConstitucion());
@@ -114,7 +134,7 @@ public class PersonaJuridicaService {
 
     private PersonaJuridica convertirAEntidad(PersonaJuridicaDTO dto) {
         PersonaJuridica entidad = new PersonaJuridica();
-        
+
         entidad.setRazonSocial(dto.getRazonSocial());
         entidad.setCuit(dto.getCuit());
         entidad.setFechaConstitucion(dto.getFechaConstitucion());
@@ -125,4 +145,3 @@ public class PersonaJuridicaService {
         return entidad;
     }
 }
-

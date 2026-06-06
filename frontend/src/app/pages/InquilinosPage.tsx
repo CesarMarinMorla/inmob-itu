@@ -21,6 +21,7 @@ import {
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
 import { useAuthClient } from '../services/authClient';
 import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica, getPersonasJuridicas, deletePersonaJuridica, type PersonaJuridica } from '../services/personasService';
+import { useAuthClient } from '../services/authClient';
 
 export default function InquilinosPage() {
   const navigate = useNavigate();
