@@ -65,7 +65,10 @@ export interface PropiedadConTipo extends PropiedadDTO {
 
 // ── CASAS ─────────────────────────────────────────────────────────────────────
 export const getCasas = (fetchWithToken: FetchFn): Promise<CasaDTO[]> =>
-  fetchWithToken('/casas').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+  fetchWithToken('/casas').then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json().then(res => Array.isArray(res) ? res : (res?.data || []));
+  });
 
 export const getCasaById = (fetchWithToken: FetchFn, id: number): Promise<CasaDTO> =>
   fetchWithToken(`/casas/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
@@ -84,7 +87,10 @@ export const deleteCasa = (fetchWithToken: FetchFn, id: number): Promise<void> =
 
 // ── DEPARTAMENTOS ─────────────────────────────────────────────────────────────
 export const getDepartamentos = (fetchWithToken: FetchFn): Promise<DepartamentoDTO[]> =>
-  fetchWithToken('/departamentos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+  fetchWithToken('/departamentos').then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json().then(res => Array.isArray(res) ? res : (res?.data || []));
+  });
 
 export const getDepartamentoById = (fetchWithToken: FetchFn, id: number): Promise<DepartamentoDTO> =>
   fetchWithToken(`/departamentos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
@@ -103,7 +109,10 @@ export const deleteDepartamento = (fetchWithToken: FetchFn, id: number): Promise
 
 // ── TERRENOS ──────────────────────────────────────────────────────────────────
 export const getTerrenos = (fetchWithToken: FetchFn): Promise<TerrenoDTO[]> =>
-  fetchWithToken('/terrenos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+  fetchWithToken('/terrenos').then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json().then(res => Array.isArray(res) ? res : (res?.data || []));
+  });
 
 export const getTerrenoById = (fetchWithToken: FetchFn, id: number): Promise<TerrenoDTO> =>
   fetchWithToken(`/terrenos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });

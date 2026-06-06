@@ -30,7 +30,10 @@ export interface ContratoDTO {
 }
 
 export const getContratos = (fetchWithToken: FetchFn): Promise<ContratoDTO[]> =>
-  fetchWithToken('/contratos').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+  fetchWithToken('/contratos').then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json().then(res => Array.isArray(res) ? res : (res?.data || []));
+  });
 
 export const getContratoById = (fetchWithToken: FetchFn, id: number): Promise<ContratoDTO> =>
   fetchWithToken(`/contratos/${id}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });

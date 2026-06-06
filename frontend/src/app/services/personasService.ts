@@ -73,7 +73,8 @@ export const getPersonasFisicas = async (fetchWithToken: (endpoint: string, opti
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
-    return await response.json();
+    const result = await response.json();
+    return Array.isArray(result) ? result : (result?.data || []);
   } catch (error) {
     console.error('Error al obtener personas físicas:', error);
     return [];
@@ -148,7 +149,8 @@ export const getPersonasJuridicas = async (fetchWithToken: (endpoint: string, op
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
-    return await response.json();
+    const result = await response.json();
+    return Array.isArray(result) ? result : (result?.data || []);
   } catch (error) {
     console.error('Error al obtener personas jurídicas:', error);
     return [];
