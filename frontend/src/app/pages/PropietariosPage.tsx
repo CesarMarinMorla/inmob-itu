@@ -20,11 +20,13 @@ import {
   Alert,
 } from '@mui/material';
 import { Search, Add, Edit, Delete, Person, Email, Phone, LocationOn } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import { getPersonasFisicas, deletePersonaFisica, type PersonaFisica } from '../services/personasService';
 import { getPersonasJuridicas, deletePersonaJuridica, type PersonaJuridica } from '../services/personasService';
 
 export default function PropietariosPage() {
   const navigate = useNavigate();
+  const { fetchWithToken } = useAuthClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [propietarios, setPropietarios] = useState<(PersonaFisica | PersonaJuridica)[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,11 +40,11 @@ export default function PropietariosPage() {
 
   useEffect(() => {
     loadPropietarios();
-  }, []);
+  }, [fetchWithToken]);
 
   const loadPropietarios = async () => {
-    const data = await getPersonasFisicas('propietario');
-    const data2 = await getPersonasJuridicas('propietario');
+    const data = await getPersonasFisicas(fetchWithToken, 'propietario');
+    const data2 = await getPersonasJuridicas(fetchWithToken, 'propietario');
     setPropietarios([...data, ...data2]);
   };
 
@@ -78,9 +80,9 @@ export default function PropietariosPage() {
 
     let success = false;
     if (deleteTipo === 'fisica') {
-      success = await deletePersonaFisica(selectedId.toString());
+      success = await deletePersonaFisica(fetchWithToken, selectedId.toString());
     } else {
-      success = await deletePersonaJuridica(selectedId.toString());
+      success = await deletePersonaJuridica(fetchWithToken, selectedId.toString());
     }
     if (success) {
       setSnackbar({ open: true, message: 'Propietario eliminado exitosamente', severity: 'success' });
@@ -103,9 +105,9 @@ export default function PropietariosPage() {
 
   const getDocumento = (prop: PersonaFisica | PersonaJuridica): string => {
     if ('numDocumento' in prop) {
-      return `${prop.tipoDocumento || 'DNI'} ${prop.numDocumento || ''}`;
+      return `${prop.tipoDocumento || 'dni'} ${prop.numDocumento || ''}`;
     } else {
-      return `CUIT ${prop.cuit || ''}`;
+      return `cuit ${prop.cuit || ''}`;
     }
   };
 

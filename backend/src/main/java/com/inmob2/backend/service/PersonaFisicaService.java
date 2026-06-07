@@ -8,8 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,10 +24,26 @@ public class PersonaFisicaService {
     private final PersonaFisicaRepository personaFisicaRepository;
 
     @Transactional(readOnly = true)
-    public List<PersonaFisicaDTO> obtenerTodas() {
-        return personaFisicaRepository.findAll().stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public Page<PersonaFisicaDTO> obtenerTodas(Pageable pageable) {
+        return personaFisicaRepository.findAll(pageable).map(this::convertirADto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PersonaFisicaDTO> obtenerPorRol(String rol, Pageable pageable) {
+        Map<String, Function<Pageable, Page<PersonaFisica>>> queries = Map.of(
+                "inquilino", personaFisicaRepository::findAllWithRolInquilino,
+                "propietario", personaFisicaRepository::findAllWithRolPropietario,
+                "garante", personaFisicaRepository::findAllWithRolGarante,
+                "empleado", personaFisicaRepository::findAllWithRolEmpleado,
+                "administrador", personaFisicaRepository::findAllWithRolAdministrador);
+
+        Function<Pageable, Page<PersonaFisica>> query = queries.get(rol.toLowerCase());
+        if (query == null) {
+            throw new IllegalArgumentException(
+                    "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
+        }
+
+        return query.apply(pageable).map(this::convertirADto);
     }
 
     @Transactional(readOnly = true)
@@ -33,13 +53,12 @@ public class PersonaFisicaService {
                 "propietario", personaFisicaRepository::findAllWithRolPropietario,
                 "garante", personaFisicaRepository::findAllWithRolGarante,
                 "empleado", personaFisicaRepository::findAllWithRolEmpleado,
-                "administrador", personaFisicaRepository::findAllWithRolAdministrador
-        );
+                "administrador", personaFisicaRepository::findAllWithRolAdministrador);
 
         Supplier<List<PersonaFisica>> query = queries.get(rol.toLowerCase());
         if (query == null) {
             throw new IllegalArgumentException(
-                "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
+                    "Tipo de rol no reconocido: '" + rol + "'. Valores válidos: " + queries.keySet());
         }
 
         return query.get().stream()
@@ -100,13 +119,14 @@ public class PersonaFisicaService {
         try {
             personaFisicaRepository.deleteById(id);
         } catch (Exception e) {
-            throw new IllegalStateException("No se puede eliminar la persona porque tiene registros asociados (ej: es propietaria de un inmueble o tiene contratos activos).");
+            throw new IllegalStateException(
+                    "No se puede eliminar la persona porque tiene registros asociados (ej: es propietaria de un inmueble o tiene contratos activos).");
         }
     }
 
     private PersonaFisicaDTO convertirADto(PersonaFisica entidad) {
         PersonaFisicaDTO dto = new PersonaFisicaDTO();
-        
+
         // Asignamos propiedades específicas de Física
         dto.setPrimerNombre(entidad.getPrimerNombre());
         dto.setSegundoNombre(entidad.getSegundoNombre());
@@ -124,7 +144,7 @@ public class PersonaFisicaService {
 
     private PersonaFisica convertirAEntidad(PersonaFisicaDTO dto) {
         PersonaFisica entidad = new PersonaFisica();
-        
+
         // Asignamos propiedades específicas de Física
         entidad.setPrimerNombre(dto.getPrimerNombre());
         entidad.setSegundoNombre(dto.getSegundoNombre());
@@ -140,5 +160,3 @@ public class PersonaFisicaService {
         return entidad;
     }
 }
-
-

@@ -1,14 +1,15 @@
 package com.inmob2.backend.controller.contrato;
 
 import com.inmob2.backend.model.dto.contrato.ContratoDTO;
+import com.inmob2.backend.model.response.PageResponse;
 import com.inmob2.backend.service.contrato.ContratoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/contratos")
@@ -18,8 +19,11 @@ public class ContratoController {
     private final ContratoService contratoService;
 
     @GetMapping
-    public ResponseEntity<List<ContratoDTO>> listarTodos() {
-        return ResponseEntity.ok(contratoService.obtenerTodos());
+    public ResponseEntity<PageResponse<ContratoDTO>> listarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(PageResponse.fromPage(
+                contratoService.obtenerTodos(PageRequest.of(page, size, Sort.by("id").descending()))));
     }
 
     @GetMapping("/{id}")
@@ -35,7 +39,7 @@ public class ContratoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ContratoDTO> actualizarContrato(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody ContratoDTO dto) {
         return ResponseEntity.ok(contratoService.actualizar(id, dto));
     }

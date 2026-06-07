@@ -20,17 +20,21 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Business, Person, ArrowBack, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import {
   createPersonaFisica,
   createPersonaJuridica,
+  asignarRolInquilino,
   type Telefono,
   type Mail,
   type PersonaFisica,
   type PersonaJuridica,
+  type InquilinoDTO,
 } from '../services/personasService';
 
 export default function NuevoInquilinoPage() {
   const navigate = useNavigate();
+  const { fetchWithToken } = useAuthClient();
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -43,7 +47,7 @@ export default function NuevoInquilinoPage() {
   const [segundoNombre, setSegundoNombre] = useState('');
   const [primerApellido, setPrimerApellido] = useState('');
   const [segundoApellido, setSegundoApellido] = useState('');
-  const [tipoDocumento, setTipoDocumento] = useState<'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte'>('DNI');
+  const [tipoDocumento, setTipoDocumento] = useState<'dni' | 'cuit' | 'cuil' | 'pasaporte'>('dni');
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
 
@@ -54,8 +58,8 @@ export default function NuevoInquilinoPage() {
   const [fechaConstitucion, setFechaConstitucion] = useState('');
 
   // Campos comunes de contacto
-  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
-  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
+  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'celular' }]);
+  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'personal', esPrincipal: true }]);
 
   // Dirección
   const [calle, setCalle] = useState('');
@@ -66,7 +70,7 @@ export default function NuevoInquilinoPage() {
   const [provincia, setProvincia] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
-  const [tipoDomicilio, setTipoDomicilio] = useState<'PARTICULAR' | 'LABORAL' | 'OTRO'>('PARTICULAR');
+  const [tipoDomicilio, setTipoDomicilio] = useState<'legal' | 'particular' | 'comercial'>('particular');
 
   const provinciasArgentinas = [
     'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -77,7 +81,7 @@ export default function NuevoInquilinoPage() {
   ];
 
   const handleAddTelefono = () => {
-    setTelefonos([...telefonos, { numero: '', tipo: 'CELULAR' }]);
+    setTelefonos([...telefonos, { numero: '', tipo: 'celular' }]);
   };
 
   const handleRemoveTelefono = (index: number) => {
@@ -91,7 +95,7 @@ export default function NuevoInquilinoPage() {
   };
 
   const handleAddMail = () => {
-    setMails([...mails, { email: '', tipo: 'PERSONAL', esPrincipal: mails.length === 0 }]);
+    setMails([...mails, { email: '', tipo: 'personal', esPrincipal: mails.length === 0 }]);
   };
 
   const handleRemoveMail = (index: number) => {
@@ -143,12 +147,19 @@ export default function NuevoInquilinoPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaFisica(personaData);
-      if (result) {
-        setSnackbar({ open: true, message: 'Inquilino creado exitosamente', severity: 'success' });
-        setTimeout(() => navigate('/inquilinos'), 1500);
+      const result = await createPersonaFisica(fetchWithToken, personaData);
+      if (result && result.id) {
+        // Asignar rol de inquilino
+        const inquilinoData: InquilinoDTO = {};
+        const rolResult = await asignarRolInquilino(fetchWithToken, Number(result.id), inquilinoData);
+        if (rolResult) {
+          setSnackbar({ open: true, message: 'Inquilino creado exitosamente', severity: 'success' });
+          setTimeout(() => navigate('/inquilinos'), 1500);
+        } else {
+          setSnackbar({ open: true, message: 'Persona creada pero error al asignar rol de inquilino', severity: 'error' });
+        }
       } else {
-        setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
+        setSnackbar({ open: true, message: 'Error al crear la persona', severity: 'error' });
       }
     } else {
       if (!razonSocial || !cuit) {
@@ -164,12 +175,19 @@ export default function NuevoInquilinoPage() {
         mails: mails.filter(m => m.email.trim() !== ''),
         direcciones: [buildDireccion()],
       };
-      const result = await createPersonaJuridica(empresaData);
-      if (result) {
-        setSnackbar({ open: true, message: 'Empresa creada exitosamente', severity: 'success' });
-        setTimeout(() => navigate('/inquilinos'), 1500);
+      const result = await createPersonaJuridica(fetchWithToken, empresaData);
+      if (result && result.id) {
+        // Asignar rol de inquilino
+        const inquilinoData: InquilinoDTO = {};
+        const rolResult = await asignarRolInquilino(fetchWithToken, Number(result.id), inquilinoData);
+        if (rolResult) {
+          setSnackbar({ open: true, message: 'Empresa creada exitosamente', severity: 'success' });
+          setTimeout(() => navigate('/inquilinos'), 1500);
+        } else {
+          setSnackbar({ open: true, message: 'Empresa creada pero error al asignar rol de inquilino', severity: 'error' });
+        }
       } else {
-        setSnackbar({ open: true, message: 'Error al comunicarse con el servidor', severity: 'error' });
+        setSnackbar({ open: true, message: 'Error al crear la empresa', severity: 'error' });
       }
     }
   };
@@ -294,10 +312,10 @@ export default function NuevoInquilinoPage() {
                       onChange={(e) => setTipoDocumento(e.target.value as any)}
                       required
                     >
-                      <MenuItem value="DNI">DNI</MenuItem>
-                      <MenuItem value="CUIT">CUIT</MenuItem>
-                      <MenuItem value="CUIL">CUIL</MenuItem>
-                      <MenuItem value="Pasaporte">Pasaporte</MenuItem>
+                      <MenuItem value="dni">DNI</MenuItem>
+                      <MenuItem value="cuit">CUIT</MenuItem>
+                      <MenuItem value="cuil">CUIL</MenuItem>
+                      <MenuItem value="pasaporte">Pasaporte</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 8 }}>
@@ -404,10 +422,10 @@ export default function NuevoInquilinoPage() {
                       fullWidth
                       label="Tipo"
                       value={tel.tipo}
-                      onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'CELULAR' | 'FIJO')}
+                      onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'celular' | 'fijo')}
                     >
-                      <MenuItem value="CELULAR">Celular</MenuItem>
-                      <MenuItem value="FIJO">Fijo</MenuItem>
+                      <MenuItem value="celular">Celular</MenuItem>
+                      <MenuItem value="fijo">Fijo</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -446,10 +464,10 @@ export default function NuevoInquilinoPage() {
                       fullWidth
                       label="Tipo"
                       value={mail.tipo}
-                      onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'PERSONAL' | 'LABORAL')}
+                      onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'personal' | 'laboral')}
                     >
-                      <MenuItem value="PERSONAL">Personal</MenuItem>
-                      <MenuItem value="LABORAL">Laboral</MenuItem>
+                      <MenuItem value="personal">Personal</MenuItem>
+                      <MenuItem value="laboral">Laboral</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -503,11 +521,11 @@ export default function NuevoInquilinoPage() {
                   fullWidth
                   label="Tipo de Domicilio"
                   value={tipoDomicilio}
-                  onChange={(e) => setTipoDomicilio(e.target.value as 'PARTICULAR' | 'LABORAL' | 'OTRO')}
+                  onChange={(e) => setTipoDomicilio(e.target.value as 'legal' | 'particular' | 'comercial')}
                 >
-                  <MenuItem value="PARTICULAR">Particular</MenuItem>
-                  <MenuItem value="LABORAL">Laboral</MenuItem>
-                  <MenuItem value="OTRO">Otro</MenuItem>
+                  <MenuItem value="particular">Particular</MenuItem>
+                  <MenuItem value="legal">Legal</MenuItem>
+                  <MenuItem value="comercial">Comercial</MenuItem>
                 </TextField>
               </Grid>
             </Grid>

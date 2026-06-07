@@ -30,6 +30,7 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Business, Person, ArrowBack, Delete, Add, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useAuthClient } from '../services/authClient';
 import {
   getPersonaFisicaByDni,
   updatePersonaFisica,
@@ -50,6 +51,7 @@ import {
 export default function EditarPropietarioPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { fetchWithToken } = useAuthClient();
   const [loading, setLoading] = useState(true);
   const [tipo, setTipo] = useState<'persona' | 'empresa'>('persona');
   const [personaId, setPersonaId] = useState<number | string | null>(null);
@@ -65,7 +67,7 @@ export default function EditarPropietarioPage() {
   const [segundoNombre, setSegundoNombre] = useState('');
   const [primerApellido, setPrimerApellido] = useState('');
   const [segundoApellido, setSegundoApellido] = useState('');
-  const [tipoDocumento, setTipoDocumento] = useState<'DNI' | 'CUIT' | 'CUIL' | 'Pasaporte'>('DNI');
+  const [tipoDocumento, setTipoDocumento] = useState<'dni' | 'cuit' | 'cuil' | 'pasaporte'>('dni');
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
 
@@ -77,8 +79,8 @@ export default function EditarPropietarioPage() {
 
 
   // Campos comunes
-  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'CELULAR' }]);
-  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'PERSONAL', esPrincipal: true }]);
+  const [telefonos, setTelefonos] = useState<Telefono[]>([{ numero: '', tipo: 'celular' }]);
+  const [mails, setMails] = useState<Mail[]>([{ email: '', tipo: 'personal', esPrincipal: true }]);
 
   const [calle, setCalle] = useState('');
   const [altura, setAltura] = useState('');
@@ -88,7 +90,7 @@ export default function EditarPropietarioPage() {
   const [provincia, setProvincia] = useState('');
   const [localidad, setLocalidad] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
-  const [tipoDomicilio, setTipoDomicilio] = useState<'PARTICULAR' | 'LABORAL' | 'OTRO'>('PARTICULAR');
+  const [tipoDomicilio, setTipoDomicilio] = useState<'legal' | 'particular' | 'comercial'>('particular');
 
   // Inquilinos vinculados
   const [inquilinosVinculados, setInquilinosVinculados] = useState<Inquilino[]>([]);
@@ -103,7 +105,7 @@ export default function EditarPropietarioPage() {
   ];
 
   const handleAddTelefono = () => {
-    setTelefonos([...telefonos, { numero: '', tipo: 'CELULAR' }]);
+    setTelefonos([...telefonos, { numero: '', tipo: 'celular' }]);
   };
 
   const handleRemoveTelefono = (index: number) => {
@@ -117,7 +119,7 @@ export default function EditarPropietarioPage() {
   };
 
   const handleAddMail = () => {
-    setMails([...mails, { email: '', tipo: 'PERSONAL', esPrincipal: mails.length === 0 }]);
+    setMails([...mails, { email: '', tipo: 'personal', esPrincipal: mails.length === 0 }]);
   };
 
   const handleRemoveMail = (index: number) => {
@@ -141,30 +143,30 @@ export default function EditarPropietarioPage() {
     const loadPropietario = async () => {
       if (id) {
         let isEmpresa = false;
-        let propietario: any = await getPersonaFisicaByDni(id);
-        
+        let propietario: any = await getPersonaFisicaByDni(fetchWithToken, id);
+
         if (!propietario) {
-          propietario = await getPersonaJuridicaByCuit(id);
+          propietario = await getPersonaJuridicaByCuit(fetchWithToken, id);
           isEmpresa = !!propietario;
         }
 
         if (propietario) {
           if (propietario.id) setPersonaId(propietario.id);
           setTipo(isEmpresa ? 'empresa' : 'persona');
-          
+
           if (isEmpresa) {
-              setRazonSocial(propietario.razonSocial || '');
-              setCuit(propietario.cuit || '');
-              setFechaConstitucion(propietario.fechaConstitucion || '');
-              setNombreNegocio(propietario.nombreNegocio || '');
+            setRazonSocial(propietario.razonSocial || '');
+            setCuit(propietario.cuit || '');
+            setFechaConstitucion(propietario.fechaConstitucion || '');
+            setNombreNegocio(propietario.nombreNegocio || '');
           } else {
-              setPrimerNombre(propietario.primerNombre || '');
-              setSegundoNombre(propietario.segundoNombre || '');
-              setPrimerApellido(propietario.primerApellido || '');
-              setSegundoApellido(propietario.segundoApellido || '');
-              setTipoDocumento(propietario.tipoDocumento || 'DNI');
-              setNumeroDocumento(propietario.numDocumento || '');
-              setFechaNacimiento(propietario.fechaNacimiento || '');
+            setPrimerNombre(propietario.primerNombre || '');
+            setSegundoNombre(propietario.segundoNombre || '');
+            setPrimerApellido(propietario.primerApellido || '');
+            setSegundoApellido(propietario.segundoApellido || '');
+            setTipoDocumento(propietario.tipoDocumento || 'dni');
+            setNumeroDocumento(propietario.numDocumento || '');
+            setFechaNacimiento(propietario.fechaNacimiento || '');
           }
 
           if (propietario.telefonos && propietario.telefonos.length > 0) {
@@ -183,7 +185,7 @@ export default function EditarPropietarioPage() {
             setProvincia(dir.provincia || '');
             setLocalidad(dir.localidad || '');
             setCodigoPostal(dir.codigoPostal || '');
-            setTipoDomicilio(dir.tipoDomicilio || 'PARTICULAR');
+            setTipoDomicilio(dir.tipoDomicilio || 'particular');
           }
 
           setInquilinosVinculados(getInquilinosByPropietarioId(id));
@@ -195,18 +197,18 @@ export default function EditarPropietarioPage() {
       }
     };
     loadPropietario();
-  }, [id, navigate]);
+  }, [id, navigate, fetchWithToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!id) return;
+    if (!id || !fetchWithToken) return;
 
     if (tipo === 'persona' && (!primerNombre || !primerApellido || !numeroDocumento)) {
       setSnackbar({ open: true, message: 'Por favor complete nombre, apellido y documento', severity: 'error' });
       return;
     }
-    
+
     if (tipo === 'empresa' && (!razonSocial || !cuit)) {
       setSnackbar({ open: true, message: 'Por favor complete razón social y CUIT', severity: 'error' });
       return;
@@ -236,26 +238,26 @@ export default function EditarPropietarioPage() {
     let updated = null;
 
     if (tipo === 'persona') {
-        const personaData = {
-          ...commonData,
-          primerNombre,
-          segundoNombre,
-          primerApellido,
-          segundoApellido,
-          tipoDocumento,
-          numDocumento: numeroDocumento,
-          fechaNacimiento,
-        };
-        updated = await updatePersonaFisica(personaId, personaData as any);
+      const personaData = {
+        ...commonData,
+        primerNombre,
+        segundoNombre,
+        primerApellido,
+        segundoApellido,
+        tipoDocumento,
+        numDocumento: numeroDocumento,
+        fechaNacimiento,
+      };
+      updated = await updatePersonaFisica(fetchWithToken, personaId, personaData as any);
     } else {
-        const empresaData = {
-          ...commonData,
-          razonSocial,
-          cuit,
-          nombreNegocio,
-          fechaConstitucion,
-        };
-        updated = await updatePersonaJuridica(personaId, empresaData as any);
+      const empresaData = {
+        ...commonData,
+        razonSocial,
+        cuit,
+        nombreNegocio,
+        fechaConstitucion,
+      };
+      updated = await updatePersonaJuridica(fetchWithToken, personaId, empresaData as any);
     }
 
     if (updated) {
@@ -419,10 +421,10 @@ export default function EditarPropietarioPage() {
                           onChange={(e) => setTipoDocumento(e.target.value as any)}
                           required
                         >
-                          <MenuItem value="DNI">DNI</MenuItem>
-                          <MenuItem value="CUIT">CUIT</MenuItem>
-                          <MenuItem value="CUIL">CUIL</MenuItem>
-                          <MenuItem value="Pasaporte">Pasaporte</MenuItem>
+                          <MenuItem value="dni">DNI</MenuItem>
+                          <MenuItem value="cuit">CUIT</MenuItem>
+                          <MenuItem value="cuil">CUIL</MenuItem>
+                          <MenuItem value="pasaporte">Pasaporte</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 8 }}>
@@ -521,10 +523,10 @@ export default function EditarPropietarioPage() {
                           fullWidth
                           label="Tipo"
                           value={tel.tipo}
-                          onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'CELULAR' | 'FIJO')}
+                          onChange={(e) => handleTelefonoChange(index, 'tipo', e.target.value as 'celular' | 'fijo')}
                         >
-                          <MenuItem value="CELULAR">Celular</MenuItem>
-                          <MenuItem value="FIJO">Fijo</MenuItem>
+                          <MenuItem value="celular">Celular</MenuItem>
+                          <MenuItem value="fijo">Fijo</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -563,10 +565,10 @@ export default function EditarPropietarioPage() {
                           fullWidth
                           label="Tipo"
                           value={mail.tipo}
-                          onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'PERSONAL' | 'LABORAL')}
+                          onChange={(e) => handleMailChange(index, 'tipo', e.target.value as 'personal' | 'laboral')}
                         >
-                          <MenuItem value="PERSONAL">Personal</MenuItem>
-                          <MenuItem value="LABORAL">Laboral</MenuItem>
+                          <MenuItem value="personal">Personal</MenuItem>
+                          <MenuItem value="laboral">Laboral</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 2 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -620,11 +622,11 @@ export default function EditarPropietarioPage() {
                       fullWidth
                       label="Tipo de Domicilio"
                       value={tipoDomicilio}
-                      onChange={(e) => setTipoDomicilio(e.target.value as 'PARTICULAR' | 'LABORAL' | 'OTRO')}
+                      onChange={(e) => setTipoDomicilio(e.target.value as 'legal' | 'particular' | 'comercial')}
                     >
-                      <MenuItem value="PARTICULAR">Particular</MenuItem>
-                      <MenuItem value="LABORAL">Laboral</MenuItem>
-                      <MenuItem value="OTRO">Otro</MenuItem>
+                      <MenuItem value="particular">Particular</MenuItem>
+                      <MenuItem value="legal">Legal</MenuItem>
+                      <MenuItem value="comercial">Comercial</MenuItem>
                     </TextField>
                   </Grid>
                 </Grid>

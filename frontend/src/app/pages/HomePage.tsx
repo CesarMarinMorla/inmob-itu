@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { Box, Typography, Card, CardActionArea, CardContent, Icon } from '@mui/material';
-// Icons not needed anymore if we use Material Symbols Outlined through Icon component
+import IndicesWidget from '../components/IndicesWidget';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -11,12 +11,13 @@ export default function HomePage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        pt: 4,
         minHeight: '100%',
         gap: 4,
       }}
     >
-      <Box sx={{ textAlign: 'center', mb: 2 }}>
+      <Box sx={{ textAlign: 'center', mb: 1 }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'text.primary' }}>
           Hola, bienvenido
         </Typography>
@@ -24,6 +25,8 @@ export default function HomePage() {
           ¿Qué deseas hacer hoy?
         </Typography>
       </Box>
+
+      <IndicesWidget />
 
       <Box
         sx={{

@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmob2.backend.controller.PersonaJuridicaController;
 import com.inmob2.backend.model.dto.PersonaJuridicaDTO;
 import com.inmob2.backend.service.PersonaJuridicaService;
+import com.inmob2.backend.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PersonaJuridicaController.class)
+@Import(TestSecurityConfig.class)
 public class PersonaJuridicaControllerTest {
 
     @Autowired

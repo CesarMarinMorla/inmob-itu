@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,10 +33,8 @@ public class ContratoService {
     private final GaranteRepository garanteRepository;
 
     @Transactional(readOnly = true)
-    public List<ContratoDTO> obtenerTodos() {
-        return contratoRepository.findAll().stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public Page<ContratoDTO> obtenerTodos(Pageable pageable) {
+        return contratoRepository.findAll(pageable).map(this::convertirADto);
     }
 
     @Transactional(readOnly = true)
@@ -58,12 +59,12 @@ public class ContratoService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró contrato con ID: " + id));
 
         ContratoMapperUtils.mapToEntity(dto, contrato);
-        
+
         // Limpiamos listas antes de renovarlas
         contrato.getPropietarios().clear();
         contrato.getInquilinos().clear();
         contrato.getGarantes().clear();
-        
+
         vincularRelaciones(contrato, dto);
 
         return convertirADto(contratoRepository.save(contrato));
@@ -88,7 +89,8 @@ public class ContratoService {
     private void vincularRelaciones(Contrato contrato, ContratoDTO dto) {
         // 1. Propiedad
         Propiedad propiedad = propiedadRepository.findById(dto.getPropiedadAlquiladaId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró Propiedad con ID: " + dto.getPropiedadAlquiladaId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se encontró Propiedad con ID: " + dto.getPropiedadAlquiladaId()));
         contrato.setPropiedadAlquilada(propiedad);
 
         // 2. Propietarios
