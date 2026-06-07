@@ -43,8 +43,6 @@ inmob/
 │       ├── model/     # Entidades, DTOs, enums
 │       ├── repository/# Repositorios JPA
 │       └── config/    # SecurityConfig, CorsConfig
-├── database/          # Scripts SQL (pendiente)
-├── scripts/           # Scripts utilitarios (pendiente)
 └── docs/              # Documentación del proyecto
 ```
 
@@ -126,6 +124,7 @@ La app queda disponible en `http://localhost:5173`.
 | `npm run dev` | Servidor de desarrollo |
 | `npm run build` | Build de producción |
 | `npm test` | Ejecutar tests unitarios con Vitest |
+| `npx playwright test` | Tests end-to-end con Playwright |
 
 ---
 
