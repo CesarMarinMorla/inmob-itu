@@ -1,4 +1,19 @@
 
+## Convenciones de commits
+
+| Tipo | Descripción |
+|------|-------------|
+| `feat` | Funcionalidad |
+| `fix` | Corrección |
+| `chore` | Mantenimiento / tareas internas |
+| `docs` | Documentación |
+| `refactor` | Refactorización |
+| `test` | Pruebas |
+| `build` | Build / tooling |
+| `ci` | Integración continua |
+
+---
+
 1.  Comienza tu trabajo siempre desde main
 ```
 git checkout main
