@@ -125,13 +125,3 @@ La app queda disponible en `http://localhost:5173`.
 | `npm run build` | Build de producción |
 | `npm test` | Ejecutar tests unitarios con Vitest |
 | `npx playwright test` | Tests end-to-end con Playwright |
-
----
-
-## Flujo de trabajo Git
-
-- Nunca se hace push directo a `main`
-- Cada tarea se desarrolla en una rama propia
-- Los cambios se integran únicamente mediante Pull Request con al menos 1 aprobación
-
-Ver [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) para el flujo detallado.
