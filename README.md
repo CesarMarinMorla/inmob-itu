@@ -54,7 +54,7 @@ inmob/
 - **Propietarios** — listado, alta, edición (personas físicas y jurídicas)
 - **Inquilinos** — listado, alta, edición
 - **Inmuebles** — listado, alta (casas, departamentos, terrenos)
-- **Contratos** — modelo de datos y servicios implementados
+- **Contratos** — listado, alta, edición
 - **Roles** — asignación de roles a personas (propietario, inquilino, garante, empleado, administrador)
 - **Índices económicos** — consulta de IPC e ICL actualizados desde API externa, con widget en el dashboard
 
