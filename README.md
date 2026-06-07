@@ -135,11 +135,3 @@ La app queda disponible en `http://localhost:5173`.
 - Los cambios se integran únicamente mediante Pull Request con al menos 1 aprobación
 
 Ver [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) para el flujo detallado.
-
-### Convenciones de commits
-
-```
-feat(scope): descripción
-fix(scope): descripción
-chore|docs|refactor|test|build|ci(scope): descripción
-```
