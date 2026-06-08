@@ -3,8 +3,8 @@ spring:
     name: backend
   datasource:
     url: jdbc:mysql://localhost:3306/inmob_db
-    username: root
-    password:
+    username: inmob
+    password: inmob
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

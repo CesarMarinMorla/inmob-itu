@@ -1,0 +1,7 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-clfi6t361gyrqlsw.us.auth0.com/
+          audiences: https://inmob2-api
