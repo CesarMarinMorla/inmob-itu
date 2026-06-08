@@ -14,6 +14,9 @@ export default defineConfig({
     alias: {
       // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
+      ...(process.env.VITE_MOCK_AUTH === 'true'
+        ? { '@auth0/auth0-react': path.resolve(__dirname, './src/app/auth0-mock.ts') }
+        : {}),
     },
   },
   test: {
