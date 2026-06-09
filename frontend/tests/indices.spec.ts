@@ -24,7 +24,7 @@ test.describe('CP-07/08: Pruebas de Integración - API de Índices Económicos (
     });
 
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     // El widget de índices debe estar visible en el dashboard (HomePage)
     // Esperamos el h2 "Índices Económicos Actuales"
@@ -61,7 +61,7 @@ test.describe('CP-07/08: Pruebas de Integración - API de Índices Económicos (
     });
 
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     // El widget debe seguir mostrándose (usando datos del cache)
     await expect(page.locator('h2').filter({ hasText: /Índices Económicos Actuales/i }))
@@ -88,7 +88,7 @@ test.describe('CP-07/08: Pruebas de Integración - API de Índices Económicos (
     });
 
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     // Cuando el backend devuelve un error HTTP, getIndicesConsolidados retorna null
     // y el hook useIndices setea el error en el estado.

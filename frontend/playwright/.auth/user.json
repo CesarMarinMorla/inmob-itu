@@ -2,40 +2,40 @@
   "cookies": [
     {
       "name": "did",
-      "value": "s%3Av0%3A07d9e9bc-26a5-49a9-be3e-b5775ee7f50c%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.ql8TzdvOVgM%2BP4p5NG9TiB2stIFq5u4gPrR8HfGKGtY",
+      "value": "s%3Av0%3A96d7a4b2-b5f3-4ead-9797-94ab933af207%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.e%2BLy037uJ5Z1BOJBvjJAtikCrSqFY%2BnN7lPpMbUQuag",
       "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
       "path": "/",
-      "expires": 1810711863.133425,
+      "expires": 1812529247.925695,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
     },
     {
       "name": "did_compat",
-      "value": "s%3Av0%3A07d9e9bc-26a5-49a9-be3e-b5775ee7f50c%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.ql8TzdvOVgM%2BP4p5NG9TiB2stIFq5u4gPrR8HfGKGtY",
+      "value": "s%3Av0%3A96d7a4b2-b5f3-4ead-9797-94ab933af207%3A3bfa359e8b2be6e45b3aae6b5693f2c630795999e79881d795bfc8a125da6a61.e%2BLy037uJ5Z1BOJBvjJAtikCrSqFY%2BnN7lPpMbUQuag",
       "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
       "path": "/",
-      "expires": 1810711863.133654,
+      "expires": 1812529247.926186,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "auth0",
-      "value": "s%3Amidpx4k4UT4tgpG8RwQfnI1GJ8epwJoM.u18ls8vR8FMaHKoAkz1JPZIC3c3eSvR%2F%2BWVFIRH7jcQ",
+      "value": "s%3ANHOFTnxPBLyLaqKg3jLs3lPJ5l0LDolK.Y2Bqjir3lV3WQm%2ByV%2BldlmDwietJO7W3RsRN%2Fd0ptFI",
       "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
       "path": "/",
-      "expires": 1779413462.544777,
+      "expires": 1781230848.228797,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
     },
     {
       "name": "auth0_compat",
-      "value": "s%3Amidpx4k4UT4tgpG8RwQfnI1GJ8epwJoM.u18ls8vR8FMaHKoAkz1JPZIC3c3eSvR%2F%2BWVFIRH7jcQ",
+      "value": "s%3ANHOFTnxPBLyLaqKg3jLs3lPJ5l0LDolK.Y2Bqjir3lV3WQm%2ByV%2BldlmDwietJO7W3RsRN%2Fd0ptFI",
       "domain": "dev-clfi6t361gyrqlsw.us.auth0.com",
       "path": "/",
-      "expires": 1779413462.544894,
+      "expires": 1781230848.228998,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -45,7 +45,7 @@
       "value": "true",
       "domain": "localhost",
       "path": "/",
-      "expires": 1779240665,
+      "expires": 1781058050,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
@@ -55,7 +55,7 @@
       "value": "true",
       "domain": "localhost",
       "path": "/",
-      "expires": 1779240665,
+      "expires": 1781058050,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"

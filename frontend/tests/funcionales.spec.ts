@@ -18,7 +18,7 @@ test.describe('Pruebas Funcionales Autenticadas - Inmobiliaria CRM', () => {
 
   test('CP-04: Validaciones de formularios (Nuevo Propietario sin datos)', async ({ page }) => {
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     await page.goto('/propietarios/nuevo');
     await expect(page.locator('h1')).toContainText('Nuevo Propietario', { timeout: 10000 });
@@ -43,7 +43,7 @@ test.describe('Pruebas Funcionales Autenticadas - Inmobiliaria CRM', () => {
 
   test('CP-05: Consumo real de la API (Listado de Propietarios)', async ({ page }) => {
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     // Navegamos a propietarios y verificamos que la lista cargue
     await page.goto('/propietarios');
@@ -57,13 +57,13 @@ test.describe('Pruebas Funcionales Autenticadas - Inmobiliaria CRM', () => {
     // La lista puede estar vacía o tener datos reales. Ambos casos son válidos.
     // Verificamos que el área de contenido está presente (no hay crash).
     const content = page.locator('text=No hay propietarios registrados')
-      .or(page.locator('[class*="MuiCard"]').first());
+      .or(page.locator('[class*="MuiCard"]')).first();
     await expect(content).toBeVisible({ timeout: 10000 });
   });
 
   test('CP-06: Comportamiento esperado ante errores de la API (Error 500)', async ({ page }) => {
     await page.goto('/');
-    await expect(page).not.toHaveURL(/.*\/login/, { timeout: 15000 });
+    await expect(page.getByRole('banner')).toBeVisible({ timeout: 15000 });
 
     // Simulamos que el backend falla con 500 para inquilinos
     await page.route('**/api/v1/personas-fisicas/rol/inquilino', async route => {

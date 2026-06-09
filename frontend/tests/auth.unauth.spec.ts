@@ -18,7 +18,7 @@ test.describe('Pruebas de Autenticación Fallida (Sin Sesión)', () => {
     // Ingresar credenciales inválidas
     await page.getByLabel(/Email address|Dirección de email/i).fill('fake-email-invalido@test.com');
     await page.locator('input[name="password"]').fill('wrong-password-123');
-    await page.locator('button[type="submit"][name="action"][value="default"]').click();
+    await page.locator('button[type="submit"]').first().click();
 
     // Auth0 mostrará un error y permaneceremos en su dominio
     const errorMessage = page

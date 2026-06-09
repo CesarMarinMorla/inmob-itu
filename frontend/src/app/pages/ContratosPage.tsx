@@ -74,8 +74,8 @@ export default function ContratosPage() {
                   <TableCell><Chip label={c.contratoEstado} size="small" color={ESTADO_COLOR[c.contratoEstado]} /></TableCell>
                   <TableCell>{c.montoBase.toLocaleString('es-AR')} {c.tipoMoneda}</TableCell>
                   <TableCell align="right">
-                    <IconButton size="small" onClick={() => navigate(`/contratos/${c.id}/editar`)}><Edit fontSize="small" /></IconButton>
-                    <IconButton size="small" color="error" onClick={() => setDeleteTarget(c)}><Delete fontSize="small" /></IconButton>
+                    <IconButton aria-label={`editar contrato ${c.contratoNumero}`} size="small" onClick={() => navigate(`/contratos/${c.id}/editar`)}><Edit fontSize="small" /></IconButton>
+                    <IconButton aria-label={`eliminar contrato ${c.contratoNumero}`} size="small" color="error" onClick={() => setDeleteTarget(c)}><Delete fontSize="small" /></IconButton>
                   </TableCell>
                 </TableRow>
               ))}

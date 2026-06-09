@@ -19,6 +19,7 @@ export default defineConfig({
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
       name: 'chromium',
+      testIgnore: /.*video\.spec\.js/,
       use: { 
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
@@ -28,6 +29,11 @@ export default defineConfig({
     {
       name: 'unauthenticated',
       testMatch: /.*unauth\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'video-demo',
+      testMatch: /.*video\.spec\.js/,
       use: { ...devices['Desktop Chrome'] },
     }
   ],

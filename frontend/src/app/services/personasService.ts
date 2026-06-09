@@ -85,6 +85,9 @@ export const createPersonaFisica = async (fetchWithToken: (endpoint: string, opt
   try {
     const response = await fetchWithToken('/personas-fisicas', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(persona),
     });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
@@ -114,6 +117,9 @@ export const updatePersonaFisica = async (fetchWithToken: (endpoint: string, opt
   try {
     const response = await fetchWithToken(`/personas-fisicas/${id}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(persona),
     });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
@@ -161,6 +167,9 @@ export const createPersonaJuridica = async (fetchWithToken: (endpoint: string, o
   try {
     const response = await fetchWithToken('/personas-juridicas', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(persona),
     });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
@@ -189,6 +198,9 @@ export const updatePersonaJuridica = async (fetchWithToken: (endpoint: string, o
   try {
     const response = await fetchWithToken(`/personas-juridicas/${id}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(persona),
     });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);

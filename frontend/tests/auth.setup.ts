@@ -36,7 +36,7 @@ setup('Authenticate with Auth0', async ({ page }) => {
     // 3. Completar el formulario nativo de Auth0 Universal Login
     await page.getByLabel(/Email address|Dirección de email/i).fill(email);
     await page.locator('input[name="password"]').fill(password);
-    await page.locator('button[type="submit"][name="action"][value="default"]').click();
+    await page.locator('button[type="submit"]').first().click();
 
     // 4. Esperar la redirección de vuelta a nuestra app
     await page.waitForURL(url => url.hostname === 'localhost', { timeout: 20000 });
