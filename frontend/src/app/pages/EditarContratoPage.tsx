@@ -48,7 +48,9 @@ export default function EditarContratoPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [propiedades, setPropiedades] = useState<PropiedadConTipo[]>([]);
-  const [personasOpciones, setPersonasOpciones] = useState<PersonaOpcion[]>([]);
+  const [propietariosOpciones, setPropietariosOpciones] = useState<PersonaOpcion[]>([]);
+  const [inquilinosOpciones, setInquilinosOpciones] = useState<PersonaOpcion[]>([]);
+  const [garantesOpciones, setGarantesOpciones] = useState<PersonaOpcion[]>([]);
 
   const [contratoNumero, setContratoNumero] = useState('');
   const [fechaFirma, setFechaFirma] = useState('');
@@ -77,13 +79,22 @@ export default function EditarContratoPage() {
     Promise.all([
       getContratoById(fetchWithToken, Number(id)),
       getAllPropiedades(fetchWithToken),
+      getPersonasFisicas(fetchWithToken, 'propietario'),
+      getPersonasJuridicas(fetchWithToken, 'propietario'),
+      getPersonasFisicas(fetchWithToken, 'inquilino'),
+      getPersonasJuridicas(fetchWithToken, 'inquilino'),
       getPersonasFisicas(fetchWithToken),
       getPersonasJuridicas(fetchWithToken),
-    ]).then(([contrato, props, fisicas, juridicas]) => {
-      const opciones = [...toOpciones(fisicas), ...toOpciones(juridicas)];
+    ]).then(([contrato, props, propFisicas, propJuridicas, inqFisicas, inqJuridicas, allFisicas, allJuridicas]) => {
+      const propOpts = [...toOpciones(propFisicas), ...toOpciones(propJuridicas)];
+      const inqOpts = [...toOpciones(inqFisicas), ...toOpciones(inqJuridicas)];
+      const garanteOpts = [...toOpciones(allFisicas), ...toOpciones(allJuridicas)];
+      
       setPropiedades(props);
-      setPersonasOpciones(opciones);
-
+      setPropietariosOpciones(propOpts);
+      setInquilinosOpciones(inqOpts);
+      setGarantesOpciones(garanteOpts);
+ 
       setContratoNumero(contrato.contratoNumero);
       setFechaFirma(contrato.fechaFirma);
       setFechaInicio(contrato.fechaInicio);
@@ -92,9 +103,9 @@ export default function EditarContratoPage() {
       setMontoBase(String(contrato.montoBase));
       setTipoMoneda(contrato.tipoMoneda);
       setPropiedadId(String(contrato.propiedadAlquiladaId));
-      setPropietariosIds(opciones.filter((o) => contrato.propietariosIds.includes(o.id)));
-      setInquilinosIds(opciones.filter((o) => contrato.inquilinosIds.includes(o.id)));
-      setGarantesIds(opciones.filter((o) => (contrato.garantesIds ?? []).includes(o.id)));
+      setPropietariosIds(propOpts.filter((o) => contrato.propietariosIds.includes(o.id)));
+      setInquilinosIds(inqOpts.filter((o) => contrato.inquilinosIds.includes(o.id)));
+      setGarantesIds(garanteOpts.filter((o) => (contrato.garantesIds ?? []).includes(o.id)));
       setDiaVencimientoPago(contrato.diaVencimientoPago?.toString() ?? '');
       setPorcentajeComision(contrato.porcentajeComision?.toString() ?? '');
       setMontoDeposito(contrato.montoDeposito?.toString() ?? '');
@@ -202,9 +213,9 @@ export default function EditarContratoPage() {
         <CardContent>
           <Typography variant="subtitle1" fontWeight={600} gutterBottom>Personas involucradas</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Autocomplete multiple options={personasOpciones} getOptionLabel={(o) => o.label} value={propietariosIds} onChange={(_, val) => setPropietariosIds(val)} renderInput={(params) => <TextField {...params} label="Propietarios *" />} />
-            <Autocomplete multiple options={personasOpciones} getOptionLabel={(o) => o.label} value={inquilinosIds} onChange={(_, val) => setInquilinosIds(val)} renderInput={(params) => <TextField {...params} label="Inquilinos *" />} />
-            <Autocomplete multiple options={personasOpciones} getOptionLabel={(o) => o.label} value={garantesIds} onChange={(_, val) => setGarantesIds(val)} renderInput={(params) => <TextField {...params} label="Garantes (opcional)" />} />
+            <Autocomplete multiple options={propietariosOpciones} getOptionLabel={(o) => o.label} value={propietariosIds} onChange={(_, val) => setPropietariosIds(val)} renderInput={(params) => <TextField {...params} label="Propietarios *" />} />
+            <Autocomplete multiple options={inquilinosOpciones} getOptionLabel={(o) => o.label} value={inquilinosIds} onChange={(_, val) => setInquilinosIds(val)} renderInput={(params) => <TextField {...params} label="Inquilinos *" />} />
+            <Autocomplete multiple options={garantesOpciones} getOptionLabel={(o) => o.label} value={garantesIds} onChange={(_, val) => setGarantesIds(val)} renderInput={(params) => <TextField {...params} label="Garantes (opcional)" />} />
           </Box>
         </CardContent>
       </Card>

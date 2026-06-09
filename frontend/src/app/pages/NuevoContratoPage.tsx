@@ -48,7 +48,9 @@ export default function NuevoContratoPage() {
 
   // Datos para selects
   const [propiedades, setPropiedades] = useState<PropiedadConTipo[]>([]);
-  const [personasOpciones, setPersonasOpciones] = useState<PersonaOpcion[]>([]);
+  const [propietariosOpciones, setPropietariosOpciones] = useState<PersonaOpcion[]>([]);
+  const [inquilinosOpciones, setInquilinosOpciones] = useState<PersonaOpcion[]>([]);
+  const [garantesOpciones, setGarantesOpciones] = useState<PersonaOpcion[]>([]);
   const [loadingOpts, setLoadingOpts] = useState(true);
 
   // Campos obligatorios
@@ -79,11 +81,17 @@ export default function NuevoContratoPage() {
   useEffect(() => {
     Promise.all([
       getAllPropiedades(fetchWithToken),
+      getPersonasFisicas(fetchWithToken, 'propietario'),
+      getPersonasJuridicas(fetchWithToken, 'propietario'),
+      getPersonasFisicas(fetchWithToken, 'inquilino'),
+      getPersonasJuridicas(fetchWithToken, 'inquilino'),
       getPersonasFisicas(fetchWithToken),
       getPersonasJuridicas(fetchWithToken),
-    ]).then(([props, fisicas, juridicas]) => {
+    ]).then(([props, propFisicas, propJuridicas, inqFisicas, inqJuridicas, allFisicas, allJuridicas]) => {
       setPropiedades(props);
-      setPersonasOpciones([...toOpciones(fisicas), ...toOpciones(juridicas)]);
+      setPropietariosOpciones([...toOpciones(propFisicas), ...toOpciones(propJuridicas)]);
+      setInquilinosOpciones([...toOpciones(inqFisicas), ...toOpciones(inqJuridicas)]);
+      setGarantesOpciones([...toOpciones(allFisicas), ...toOpciones(allJuridicas)]);
     }).catch(() => setError('Error al cargar datos auxiliares.')).finally(() => setLoadingOpts(false));
   }, []);
 
@@ -187,7 +195,7 @@ export default function NuevoContratoPage() {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Autocomplete
               multiple
-              options={personasOpciones}
+              options={propietariosOpciones}
               getOptionLabel={(o) => o.label}
               value={propietariosIds}
               onChange={(_, val) => setPropietariosIds(val)}
@@ -195,7 +203,7 @@ export default function NuevoContratoPage() {
             />
             <Autocomplete
               multiple
-              options={personasOpciones}
+              options={inquilinosOpciones}
               getOptionLabel={(o) => o.label}
               value={inquilinosIds}
               onChange={(_, val) => setInquilinosIds(val)}
@@ -203,7 +211,7 @@ export default function NuevoContratoPage() {
             />
             <Autocomplete
               multiple
-              options={personasOpciones}
+              options={garantesOpciones}
               getOptionLabel={(o) => o.label}
               value={garantesIds}
               onChange={(_, val) => setGarantesIds(val)}
