@@ -11,8 +11,8 @@ Aplicación web para la gestión de propietarios, inquilinos e inmuebles. Arquit
 
 | Capa | Tecnología |
 |------|-----------|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 |
-| UI | MUI v7, Radix UI, shadcn/ui |
+| Frontend | React 19, TypeScript, Vite |
+| UI | MUI v7 |
 | Routing | React Router v7 |
 | Formularios | React Hook Form |
 | Autenticación | Auth0 |
